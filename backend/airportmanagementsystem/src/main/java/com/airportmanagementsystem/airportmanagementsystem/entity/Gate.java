@@ -1,11 +1,16 @@
 package com.airportmanagementsystem.airportmanagementsystem.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 @Entity
+@Setter
+@Getter
 @Table(name = "gate")
-public class GateEntity {
+public class Gate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long gateId;
@@ -18,10 +23,10 @@ public class GateEntity {
 
     @ManyToOne
     @JoinColumn(name = "airport_id")
-    private AirportEntity airport;
+    private Airport airport;
 
     @OneToMany(mappedBy = "gate")
-    private List<FlightEntity> flights;
+    private List<Flight> flights;
 
     public Long getGateId() {
         return gateId;
@@ -47,16 +52,16 @@ public class GateEntity {
     public void setStatus(String status) {
         this.status = status;
     }
-    public AirportEntity getAirport() {
+    public Airport getAirport() {
         return airport;
     }
-    public void setAirport(AirportEntity airport) {
+    public void setAirport(Airport airport) {
         this.airport = airport;
     }
-    public List<FlightEntity> getFlights() {
+    public List<Flight> getFlights() {
         return flights;
     }
-    public void setFlights(List<FlightEntity> flights) {
+    public void setFlights(List<Flight> flights) {
         this.flights = flights;
     }
 }
