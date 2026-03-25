@@ -26,7 +26,7 @@ public class Gate {
     private Airport airport;
 
     @OneToMany(mappedBy = "gate")
-    private List<Flight> flights;
+private List<FlightSchedule> schedules;
 
     public Long getGateId() {
         return gateId;
@@ -57,11 +57,5 @@ public class Gate {
     }
     public void setAirport(Airport airport) {
         this.airport = airport;
-    }
-    public List<Flight> getFlights() {
-        return flights;
-    }
-    public void setFlights(List<Flight> flights) {
-        this.flights = flights;
     }
 }

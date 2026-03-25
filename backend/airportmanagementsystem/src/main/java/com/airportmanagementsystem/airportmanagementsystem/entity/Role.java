@@ -4,7 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,22 +11,13 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "employee")
-public class Employee {
+@Table(name = "role")
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long employeeId;
+    private Long roleId;
 
-    private String name;
-    private String email;
-    private String phone;
-
-    @ManyToOne
-    private Airport airport;
-
-    @ManyToOne
-    private Role role;
-
-    private String status;
+    private String roleName;
+    private String description;
 }
