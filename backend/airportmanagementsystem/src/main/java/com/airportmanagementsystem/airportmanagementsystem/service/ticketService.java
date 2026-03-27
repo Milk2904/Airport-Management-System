@@ -1,14 +1,8 @@
 package com.airportmanagementsystem.airportmanagementsystem.service;
 
-import com.airportmanagementsystem.airportmanagementsystem.dto.request.CreateTicketRequest;
-import com.airportmanagementsystem.airportmanagementsystem.entity.Employee;
-import com.airportmanagementsystem.airportmanagementsystem.entity.FlightSchedule;
-import com.airportmanagementsystem.airportmanagementsystem.entity.Passenger;
-import com.airportmanagementsystem.airportmanagementsystem.entity.Seat;
-import com.airportmanagementsystem.airportmanagementsystem.entity.Ticket;
-import com.airportmanagementsystem.airportmanagementsystem.repository.PassengerRepository;
-import com.airportmanagementsystem.airportmanagementsystem.repository.TicketRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.airportmanagementsystem.airportmanagementsystem.entity.*;
+import com.airportmanagementsystem.airportmanagementsystem.repository.*;
+import com.airportmanagementsystem.airportmanagementsystem.dto.request.TicketRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,58 +10,79 @@ import java.util.List;
 
 @Service
 public class TicketService {
-    @Autowired
-    private TicketRepository ticketRepository;
-    @Autowired
-    private PassengerRepository passengerRepository;
-    // @Autowired
-    // private FlightScheduleRepository scheduleRepository;
-    // @Autowired
-    // private SeatRepository seatRepository;
-    // @Autowired
-    // private EmployeeRepository employeeRepository;
 
-    public Ticket createTicket(CreateTicketRequest req) {
+    private final TicketRepository ticketRepository;
+    private final PassengerRepository passengerRepository;
+    private final FlightScheduleRepository flightScheduleRepository;
+    private final SeatRepository seatRepository;
+    private final EmployeeRepository employeeRepository;
 
-        Passenger passenger = passengerRepository.findById(req.getPassengerId())
-                .orElseThrow(() -> new RuntimeException("Passenger not found"));
+    public TicketService(
+            TicketRepository ticketRepository,
+            PassengerRepository passengerRepository,
+            FlightScheduleRepository flightScheduleRepository,
+            SeatRepository seatRepository,
+            EmployeeRepository employeeRepository) {
+        this.ticketRepository = ticketRepository;
+        this.passengerRepository = passengerRepository;
+        this.flightScheduleRepository = flightScheduleRepository;
+        this.seatRepository = seatRepository;
+        this.employeeRepository = employeeRepository;
+    }
 
-        // FlightSchedule schedule = scheduleRepository.findById(req.getScheduleId())
-        // .orElseThrow(() -> new RuntimeException("Schedule not found"));
+    public List<Ticket> getAll() {
+        return ticketRepository.findAll();
+    }
 
-        // Seat seat = seatRepository.findById(req.getSeatId())
-        // .orElseThrow(() -> new RuntimeException("Seat not found"));
+    public Ticket getById(Long id) {
+        return ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+    }
 
-        // Employee employee = employeeRepository.findById(req.getEmployeeId())
-        // .orElseThrow(() -> new RuntimeException("Employee not found"));
-
+    public Ticket create(TicketRequest req) {
         Ticket ticket = new Ticket();
-        ticket.setPassenger(passenger);
-        // ticket.setSchedule(schedule);
-        // ticket.setSeat(seat);
-        // ticket.setEmployee(employee);
+
+        ticket.setPassenger(passengerRepository.findById(req.getPassengerId())
+                .orElseThrow(() -> new RuntimeException("Passenger not found")));
+
+        ticket.setSchedule(flightScheduleRepository.findById(req.getScheduleId())
+                .orElseThrow(() -> new RuntimeException("Schedule not found")));
+
+        ticket.setSeat(seatRepository.findById(req.getSeatId())
+                .orElseThrow(() -> new RuntimeException("Seat not found")));
+
+        ticket.setEmployee(employeeRepository.findById(req.getEmployeeId())
+                .orElseThrow(() -> new RuntimeException("Employee not found")));
+
         ticket.setPrice(req.getPrice());
-        ticket.setStatus(req.getStatus() != null ? req.getStatus() : "BOOKED");
+        ticket.setStatus(req.getStatus());
         ticket.setCreatedAt(LocalDateTime.now());
 
         return ticketRepository.save(ticket);
     }
 
-    public TicketService(TicketRepository ticketRepository) {
-        this.ticketRepository = ticketRepository;
+    public Ticket update(Long id, TicketRequest req) {
+        Ticket ticket = getById(id);
+
+        ticket.setPassenger(passengerRepository.findById(req.getPassengerId())
+                .orElseThrow(() -> new RuntimeException("Passenger not found")));
+
+        ticket.setSchedule(flightScheduleRepository.findById(req.getScheduleId())
+                .orElseThrow(() -> new RuntimeException("Schedule not found")));
+
+        ticket.setSeat(seatRepository.findById(req.getSeatId())
+                .orElseThrow(() -> new RuntimeException("Seat not found")));
+
+        ticket.setEmployee(employeeRepository.findById(req.getEmployeeId())
+                .orElseThrow(() -> new RuntimeException("Employee not found")));
+
+        ticket.setPrice(req.getPrice());
+        ticket.setStatus(req.getStatus());
+
+        return ticketRepository.save(ticket);
     }
 
-    public List<Ticket> getAllTickets() {
-        return ticketRepository.findAll();
+    public void delete(Long id) {
+        ticketRepository.deleteById(id);
     }
-
-    // public List<Ticket> getByPassenger(Long passengerId) {
-    // return ticketRepository.findByPassenger_PassengerId(passengerId);
-    // }
-
-    // // test check seat
-    // public boolean isSeatBooked(Long scheduleId, Long seatId) {
-    // return ticketRepository.existsBySchedule_ScheduleIdAndSeat_SeatId(scheduleId,
-    // seatId);
-    // }
 }

@@ -5,9 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateAccountRequest {
+public class CreateSeatRequest {
+    private String seatNumber;
+    private String seatClass;
+    private String status;
     private Long aircraftId;
-    private Long employeeId;
-    private String username;
-    private String password;
 }

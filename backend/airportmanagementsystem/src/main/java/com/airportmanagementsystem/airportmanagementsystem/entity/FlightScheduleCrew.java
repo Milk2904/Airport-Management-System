@@ -7,10 +7,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Table(name = "flight_schedule_crew",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"schedule_id", "crew_id"}))
+@Getter
+@Setter
+@Table(name = "flight_schedule_crew", uniqueConstraints = @UniqueConstraint(columnNames = { "schedule_id", "crew_id" }))
 public class FlightScheduleCrew {
 
     @Id
