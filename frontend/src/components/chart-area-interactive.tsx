@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import * as React from "react";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Card,
   CardAction,
@@ -11,158 +11,152 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@/components/ui/toggle-group"
+} from "@/components/ui/select";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-export const description = "An interactive area chart"
+export const description = "An interactive area chart";
 
-const chartData = [
-  { date: "2024-04-01", desktop: 222, mobile: 150 },
-  { date: "2024-04-02", desktop: 97, mobile: 180 },
-  { date: "2024-04-03", desktop: 167, mobile: 120 },
-  { date: "2024-04-04", desktop: 242, mobile: 260 },
-  { date: "2024-04-05", desktop: 373, mobile: 290 },
-  { date: "2024-04-06", desktop: 301, mobile: 340 },
-  { date: "2024-04-07", desktop: 245, mobile: 180 },
-  { date: "2024-04-08", desktop: 409, mobile: 320 },
-  { date: "2024-04-09", desktop: 59, mobile: 110 },
-  { date: "2024-04-10", desktop: 261, mobile: 190 },
-  { date: "2024-04-11", desktop: 327, mobile: 350 },
-  { date: "2024-04-12", desktop: 292, mobile: 210 },
-  { date: "2024-04-13", desktop: 342, mobile: 380 },
-  { date: "2024-04-14", desktop: 137, mobile: 220 },
-  { date: "2024-04-15", desktop: 120, mobile: 170 },
-  { date: "2024-04-16", desktop: 138, mobile: 190 },
-  { date: "2024-04-17", desktop: 446, mobile: 360 },
-  { date: "2024-04-18", desktop: 364, mobile: 410 },
-  { date: "2024-04-19", desktop: 243, mobile: 180 },
-  { date: "2024-04-20", desktop: 89, mobile: 150 },
-  { date: "2024-04-21", desktop: 137, mobile: 200 },
-  { date: "2024-04-22", desktop: 224, mobile: 170 },
-  { date: "2024-04-23", desktop: 138, mobile: 230 },
-  { date: "2024-04-24", desktop: 387, mobile: 290 },
-  { date: "2024-04-25", desktop: 215, mobile: 250 },
-  { date: "2024-04-26", desktop: 75, mobile: 130 },
-  { date: "2024-04-27", desktop: 383, mobile: 420 },
-  { date: "2024-04-28", desktop: 122, mobile: 180 },
-  { date: "2024-04-29", desktop: 315, mobile: 240 },
-  { date: "2024-04-30", desktop: 454, mobile: 380 },
-  { date: "2024-05-01", desktop: 165, mobile: 220 },
-  { date: "2024-05-02", desktop: 293, mobile: 310 },
-  { date: "2024-05-03", desktop: 247, mobile: 190 },
-  { date: "2024-05-04", desktop: 385, mobile: 420 },
-  { date: "2024-05-05", desktop: 481, mobile: 390 },
-  { date: "2024-05-06", desktop: 498, mobile: 520 },
-  { date: "2024-05-07", desktop: 388, mobile: 300 },
-  { date: "2024-05-08", desktop: 149, mobile: 210 },
-  { date: "2024-05-09", desktop: 227, mobile: 180 },
-  { date: "2024-05-10", desktop: 293, mobile: 330 },
-  { date: "2024-05-11", desktop: 335, mobile: 270 },
-  { date: "2024-05-12", desktop: 197, mobile: 240 },
-  { date: "2024-05-13", desktop: 197, mobile: 160 },
-  { date: "2024-05-14", desktop: 448, mobile: 490 },
-  { date: "2024-05-15", desktop: 473, mobile: 380 },
-  { date: "2024-05-16", desktop: 338, mobile: 400 },
-  { date: "2024-05-17", desktop: 499, mobile: 420 },
-  { date: "2024-05-18", desktop: 315, mobile: 350 },
-  { date: "2024-05-19", desktop: 235, mobile: 180 },
-  { date: "2024-05-20", desktop: 177, mobile: 230 },
-  { date: "2024-05-21", desktop: 82, mobile: 140 },
-  { date: "2024-05-22", desktop: 81, mobile: 120 },
-  { date: "2024-05-23", desktop: 252, mobile: 290 },
-  { date: "2024-05-24", desktop: 294, mobile: 220 },
-  { date: "2024-05-25", desktop: 201, mobile: 250 },
-  { date: "2024-05-26", desktop: 213, mobile: 170 },
-  { date: "2024-05-27", desktop: 420, mobile: 460 },
-  { date: "2024-05-28", desktop: 233, mobile: 190 },
-  { date: "2024-05-29", desktop: 78, mobile: 130 },
-  { date: "2024-05-30", desktop: 340, mobile: 280 },
-  { date: "2024-05-31", desktop: 178, mobile: 230 },
-  { date: "2024-06-01", desktop: 178, mobile: 200 },
-  { date: "2024-06-02", desktop: 470, mobile: 410 },
-  { date: "2024-06-03", desktop: 103, mobile: 160 },
-  { date: "2024-06-04", desktop: 439, mobile: 380 },
-  { date: "2024-06-05", desktop: 88, mobile: 140 },
-  { date: "2024-06-06", desktop: 294, mobile: 250 },
-  { date: "2024-06-07", desktop: 323, mobile: 370 },
-  { date: "2024-06-08", desktop: 385, mobile: 320 },
-  { date: "2024-06-09", desktop: 438, mobile: 480 },
-  { date: "2024-06-10", desktop: 155, mobile: 200 },
-  { date: "2024-06-11", desktop: 92, mobile: 150 },
-  { date: "2024-06-12", desktop: 492, mobile: 420 },
-  { date: "2024-06-13", desktop: 81, mobile: 130 },
-  { date: "2024-06-14", desktop: 426, mobile: 380 },
-  { date: "2024-06-15", desktop: 307, mobile: 350 },
-  { date: "2024-06-16", desktop: 371, mobile: 310 },
-  { date: "2024-06-17", desktop: 475, mobile: 520 },
-  { date: "2024-06-18", desktop: 107, mobile: 170 },
-  { date: "2024-06-19", desktop: 341, mobile: 290 },
-  { date: "2024-06-20", desktop: 408, mobile: 450 },
-  { date: "2024-06-21", desktop: 169, mobile: 210 },
-  { date: "2024-06-22", desktop: 317, mobile: 270 },
-  { date: "2024-06-23", desktop: 480, mobile: 530 },
-  { date: "2024-06-24", desktop: 132, mobile: 180 },
-  { date: "2024-06-25", desktop: 141, mobile: 190 },
-  { date: "2024-06-26", desktop: 434, mobile: 380 },
-  { date: "2024-06-27", desktop: 448, mobile: 490 },
-  { date: "2024-06-28", desktop: 149, mobile: 200 },
-  { date: "2024-06-29", desktop: 103, mobile: 160 },
-  { date: "2024-06-30", desktop: 446, mobile: 400 },
-]
+export const chartData = [
+  { date: "2024-04-01", inboundPassengers: 222, outboundPassengers: 150 },
+  { date: "2024-04-02", inboundPassengers: 97, outboundPassengers: 180 },
+  { date: "2024-04-03", inboundPassengers: 167, outboundPassengers: 120 },
+  { date: "2024-04-04", inboundPassengers: 242, outboundPassengers: 260 },
+  { date: "2024-04-05", inboundPassengers: 373, outboundPassengers: 290 },
+  { date: "2024-04-06", inboundPassengers: 301, outboundPassengers: 340 },
+  { date: "2024-04-07", inboundPassengers: 245, outboundPassengers: 180 },
+  { date: "2024-04-08", inboundPassengers: 409, outboundPassengers: 320 },
+  { date: "2024-04-09", inboundPassengers: 59, outboundPassengers: 110 },
+  { date: "2024-04-10", inboundPassengers: 261, outboundPassengers: 190 },
+  { date: "2024-04-11", inboundPassengers: 327, outboundPassengers: 350 },
+  { date: "2024-04-12", inboundPassengers: 292, outboundPassengers: 210 },
+  { date: "2024-04-13", inboundPassengers: 342, outboundPassengers: 380 },
+  { date: "2024-04-14", inboundPassengers: 137, outboundPassengers: 220 },
+  { date: "2024-04-15", inboundPassengers: 120, outboundPassengers: 170 },
+  { date: "2024-04-16", inboundPassengers: 138, outboundPassengers: 190 },
+  { date: "2024-04-17", inboundPassengers: 446, outboundPassengers: 360 },
+  { date: "2024-04-18", inboundPassengers: 364, outboundPassengers: 410 },
+  { date: "2024-04-19", inboundPassengers: 243, outboundPassengers: 180 },
+  { date: "2024-04-20", inboundPassengers: 89, outboundPassengers: 150 },
+  { date: "2024-04-21", inboundPassengers: 137, outboundPassengers: 200 },
+  { date: "2024-04-22", inboundPassengers: 224, outboundPassengers: 170 },
+  { date: "2024-04-23", inboundPassengers: 138, outboundPassengers: 230 },
+  { date: "2024-04-24", inboundPassengers: 387, outboundPassengers: 290 },
+  { date: "2024-04-25", inboundPassengers: 215, outboundPassengers: 250 },
+  { date: "2024-04-26", inboundPassengers: 75, outboundPassengers: 130 },
+  { date: "2024-04-27", inboundPassengers: 383, outboundPassengers: 420 },
+  { date: "2024-04-28", inboundPassengers: 122, outboundPassengers: 180 },
+  { date: "2024-04-29", inboundPassengers: 315, outboundPassengers: 240 },
+  { date: "2024-04-30", inboundPassengers: 454, outboundPassengers: 380 },
+  { date: "2024-05-01", inboundPassengers: 165, outboundPassengers: 220 },
+  { date: "2024-05-02", inboundPassengers: 293, outboundPassengers: 310 },
+  { date: "2024-05-03", inboundPassengers: 247, outboundPassengers: 190 },
+  { date: "2024-05-04", inboundPassengers: 385, outboundPassengers: 420 },
+  { date: "2024-05-05", inboundPassengers: 481, outboundPassengers: 390 },
+  { date: "2024-05-06", inboundPassengers: 498, outboundPassengers: 520 },
+  { date: "2024-05-07", inboundPassengers: 388, outboundPassengers: 300 },
+  { date: "2024-05-08", inboundPassengers: 149, outboundPassengers: 210 },
+  { date: "2024-05-09", inboundPassengers: 227, outboundPassengers: 180 },
+  { date: "2024-05-10", inboundPassengers: 293, outboundPassengers: 330 },
+  { date: "2024-05-11", inboundPassengers: 335, outboundPassengers: 270 },
+  { date: "2024-05-12", inboundPassengers: 197, outboundPassengers: 240 },
+  { date: "2024-05-13", inboundPassengers: 197, outboundPassengers: 160 },
+  { date: "2024-05-14", inboundPassengers: 448, outboundPassengers: 490 },
+  { date: "2024-05-15", inboundPassengers: 473, outboundPassengers: 380 },
+  { date: "2024-05-16", inboundPassengers: 338, outboundPassengers: 400 },
+  { date: "2024-05-17", inboundPassengers: 499, outboundPassengers: 420 },
+  { date: "2024-05-18", inboundPassengers: 315, outboundPassengers: 350 },
+  { date: "2024-05-19", inboundPassengers: 235, outboundPassengers: 180 },
+  { date: "2024-05-20", inboundPassengers: 177, outboundPassengers: 230 },
+  { date: "2024-05-21", inboundPassengers: 82, outboundPassengers: 140 },
+  { date: "2024-05-22", inboundPassengers: 81, outboundPassengers: 120 },
+  { date: "2024-05-23", inboundPassengers: 252, outboundPassengers: 290 },
+  { date: "2024-05-24", inboundPassengers: 294, outboundPassengers: 220 },
+  { date: "2024-05-25", inboundPassengers: 201, outboundPassengers: 250 },
+  { date: "2024-05-26", inboundPassengers: 213, outboundPassengers: 170 },
+  { date: "2024-05-27", inboundPassengers: 420, outboundPassengers: 460 },
+  { date: "2024-05-28", inboundPassengers: 233, outboundPassengers: 190 },
+  { date: "2024-05-29", inboundPassengers: 78, outboundPassengers: 130 },
+  { date: "2024-05-30", inboundPassengers: 340, outboundPassengers: 280 },
+  { date: "2024-05-31", inboundPassengers: 178, outboundPassengers: 230 },
+  { date: "2024-06-01", inboundPassengers: 178, outboundPassengers: 200 },
+  { date: "2024-06-02", inboundPassengers: 470, outboundPassengers: 410 },
+  { date: "2024-06-03", inboundPassengers: 103, outboundPassengers: 160 },
+  { date: "2024-06-04", inboundPassengers: 439, outboundPassengers: 380 },
+  { date: "2024-06-05", inboundPassengers: 88, outboundPassengers: 140 },
+  { date: "2024-06-06", inboundPassengers: 294, outboundPassengers: 250 },
+  { date: "2024-06-07", inboundPassengers: 323, outboundPassengers: 370 },
+  { date: "2024-06-08", inboundPassengers: 385, outboundPassengers: 320 },
+  { date: "2024-06-09", inboundPassengers: 438, outboundPassengers: 480 },
+  { date: "2024-06-10", inboundPassengers: 155, outboundPassengers: 200 },
+  { date: "2024-06-11", inboundPassengers: 92, outboundPassengers: 150 },
+  { date: "2024-06-12", inboundPassengers: 492, outboundPassengers: 420 },
+  { date: "2024-06-13", inboundPassengers: 81, outboundPassengers: 130 },
+  { date: "2024-06-14", inboundPassengers: 426, outboundPassengers: 380 },
+  { date: "2024-06-15", inboundPassengers: 307, outboundPassengers: 350 },
+  { date: "2024-06-16", inboundPassengers: 371, outboundPassengers: 310 },
+  { date: "2024-06-17", inboundPassengers: 475, outboundPassengers: 520 },
+  { date: "2024-06-18", inboundPassengers: 107, outboundPassengers: 170 },
+  { date: "2024-06-19", inboundPassengers: 341, outboundPassengers: 290 },
+  { date: "2024-06-20", inboundPassengers: 408, outboundPassengers: 450 },
+  { date: "2024-06-21", inboundPassengers: 169, outboundPassengers: 210 },
+  { date: "2024-06-22", inboundPassengers: 317, outboundPassengers: 270 },
+  { date: "2024-06-23", inboundPassengers: 480, outboundPassengers: 530 },
+  { date: "2024-06-24", inboundPassengers: 132, outboundPassengers: 180 },
+  { date: "2024-06-25", inboundPassengers: 141, outboundPassengers: 190 },
+  { date: "2024-06-26", inboundPassengers: 434, outboundPassengers: 380 },
+  { date: "2024-06-27", inboundPassengers: 448, outboundPassengers: 490 },
+  { date: "2024-06-28", inboundPassengers: 149, outboundPassengers: 200 },
+  { date: "2024-06-29", inboundPassengers: 103, outboundPassengers: 160 },
+  { date: "2024-06-30", inboundPassengers: 446, outboundPassengers: 400 },
+];
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  desktop: {
-    label: "Desktop",
+  inbound: {
+    label: "Inbound",
     color: "var(--primary)",
   },
-  mobile: {
-    label: "Mobile",
+  outbound: {
+    label: "Outbound",
     color: "var(--primary)",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function ChartAreaInteractive() {
-  const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState("90d")
+  const isMobile = useIsMobile();
+  const [timeRange, setTimeRange] = React.useState("90d");
 
   React.useEffect(() => {
     if (isMobile) {
-      setTimeRange("7d")
+      setTimeRange("7d");
     }
-  }, [isMobile])
+  }, [isMobile]);
 
   const filteredData = chartData.filter((item) => {
-    const date = new Date(item.date)
-    const referenceDate = new Date("2024-06-30")
-    let daysToSubtract = 90
+    const date = new Date(item.date);
+    const referenceDate = new Date("2024-06-30");
+    let daysToSubtract = 90;
     if (timeRange === "30d") {
-      daysToSubtract = 30
+      daysToSubtract = 30;
     } else if (timeRange === "7d") {
-      daysToSubtract = 7
+      daysToSubtract = 7;
     }
-    const startDate = new Date(referenceDate)
-    startDate.setDate(startDate.getDate() - daysToSubtract)
-    return date >= startDate
-  })
+    const startDate = new Date(referenceDate);
+    startDate.setDate(startDate.getDate() - daysToSubtract);
+    return date >= startDate;
+  });
 
   return (
     <Card className="@container/card">
@@ -215,7 +209,7 @@ export function ChartAreaInteractive() {
         >
           <AreaChart data={filteredData}>
             <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillInbound" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
                   stopColor="var(--color-desktop)"
@@ -227,7 +221,7 @@ export function ChartAreaInteractive() {
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillOutbound" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
                   stopColor="var(--color-mobile)"
@@ -248,11 +242,11 @@ export function ChartAreaInteractive() {
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
-                const date = new Date(value)
+                const date = new Date(value);
                 return date.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
-                })
+                });
               }}
             />
             <ChartTooltip
@@ -263,29 +257,30 @@ export function ChartAreaInteractive() {
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
-                    })
+                    });
                   }}
                   indicator="dot"
                 />
               }
             />
             <Area
-              dataKey="mobile"
+              dataKey="inboundPassengers"
               type="natural"
-              fill="url(#fillMobile)"
-              stroke="var(--color-mobile)"
+              fill="url(#fillInbound)"
+              stroke="var(--color-inbound)"
               stackId="a"
             />
+
             <Area
-              dataKey="desktop"
+              dataKey="outboundPassengers"
               type="natural"
-              fill="url(#fillDesktop)"
-              stroke="var(--color-desktop)"
+              fill="url(#fillOutbound)"
+              stroke="var(--color-outbound)"
               stackId="a"
             />
           </AreaChart>
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }
