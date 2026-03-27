@@ -21,7 +21,7 @@ public class AccountService {
 
     public AccountResponse createAccount(CreateAccountRequest req) {
 
-        Employee employee = employeeRepository.findByEmployeeId(req.getEmployeeId())
+        Employee employee = employeeRepository.findById(req.getEmployeeId())
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
         if (accountRepository.existsByUsername(req.getUsername())) {
             throw new RuntimeException("Username already exists");

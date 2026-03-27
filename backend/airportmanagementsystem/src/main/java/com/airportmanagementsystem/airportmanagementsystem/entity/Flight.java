@@ -1,5 +1,4 @@
 package com.airportmanagementsystem.airportmanagementsystem.entity;
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,5 +26,10 @@ public class Flight {
     @ManyToOne
     @JoinColumn(name = "airline_id")
     private Airline airline;
+
+    @ManyToOne
+    @JoinColumn(name = "aircraft_id")
+    private Aircraft aircraft;
+
     private Integer duration;
 }

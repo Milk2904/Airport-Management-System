@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Entity
 @Setter
 @Getter
@@ -15,12 +14,12 @@ public class Aircraft {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long aircraftId;
 
-    private String airlineName;
-    private String airlineCode;
+    @ManyToOne
+    @JoinColumn(name = "airline_id")
+    private Airline airline;
+
     private String model;
     private Integer capacity;
     private Integer manufactureYear;
     private String status;
-
-    // getters/setters
 }
