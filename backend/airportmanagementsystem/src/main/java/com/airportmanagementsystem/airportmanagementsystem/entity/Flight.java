@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Entity
 @Setter
 @Getter
@@ -25,5 +24,8 @@ public class Flight {
     @JoinColumn(name = "arrival_airport_id")
     private Airport arrivalAirport;
 
+    @ManyToOne
+    @JoinColumn(name = "airline_id")
+    private Airline airline;
     private Integer duration;
 }

@@ -1,5 +1,5 @@
-package com.airportmanagementsystem.airportmanagementsystem.Controller;
+package com.airportmanagementsystem.airportmanagementsystem.controller;
 
-public class passengerController {
-    
+public class PassengerController {
+
 }

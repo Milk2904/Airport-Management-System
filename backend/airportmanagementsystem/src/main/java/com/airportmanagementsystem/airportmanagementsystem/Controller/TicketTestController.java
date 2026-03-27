@@ -1,39 +1,57 @@
-package com.airportmanagementsystem.airportmanagementsystem.Controller;
+package com.airportmanagementsystem.airportmanagementsystem.controller;
 
+import com.airportmanagementsystem.airportmanagementsystem.dto.request.CreateTicketRequest;
+import com.airportmanagementsystem.airportmanagementsystem.dto.response.ApiResponse;
 import com.airportmanagementsystem.airportmanagementsystem.entity.Ticket;
-import com.airportmanagementsystem.airportmanagementsystem.service.ticketService;
+import com.airportmanagementsystem.airportmanagementsystem.service.TicketService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/test/tickets")
+@RequestMapping("/ticket")
 public class TicketTestController {
+    @Autowired
+    private TicketService ticketService;
 
-    private final ticketService service;
-
-    public TicketTestController(ticketService service) {
-        this.service = service;
+    public TicketTestController(TicketService ticketService) {
+        this.ticketService = ticketService;
     }
 
-    // GET all
-    @GetMapping
-    public List<Ticket> getAll() {
-        return service.getAllTickets();
+    @PostMapping
+    public ApiResponse<Ticket> create(@RequestBody CreateTicketRequest request) {
+
+        ApiResponse<Ticket> response = new ApiResponse<>();
+
+        Ticket ticket = ticketService.createTicket(request);
+
+        response.setResult(ticket);
+
+        return response;
     }
 
-    // GET by passenger
-    @GetMapping("/passenger/{id}")
-    public List<Ticket> getByPassenger(@PathVariable Long id) {
-        return service.getByPassenger(id);
-    }
+    // @GetMapping
+    // ApiResponse<Ticket> getAll() {
+    // ApiResponse<Ticket> apiResponse = new ApiResponse<>();
 
-    // check seat
-    @GetMapping("/check")
-    public String checkSeat(@RequestParam Long scheduleId,
-                            @RequestParam Long seatId) {
+    // apiResponse.setResult(ticketService.getAllTickets());
+    // return apiResponse;
+    // }
 
-        boolean booked = service.isSeatBooked(scheduleId, seatId);
-        return booked ? "Seat already booked ❌" : "Seat available ✅";
-    }
+    // // GET by passenger
+    // @GetMapping("/passenger/{id}")
+    // public List<Ticket> getByPassenger(@PathVariable Long id) {
+    // return ticketService.getByPassenger(id);
+    // }
+
+    // // check seat
+    // @GetMapping("/check")
+    // public String checkSeat(@RequestParam Long scheduleId,
+    // @RequestParam Long seatId) {
+
+    // boolean booked = ticketService.isSeatBooked(scheduleId, seatId);
+    // return booked ? "Seat already booked ❌" : "Seat available ✅";
+    // }
 }
