@@ -16,10 +16,8 @@ import {
 import {
   PlaneTakeoffIcon,
   UsersIcon,
-  LuggageIcon,
   DoorOpenIcon,
   IdCardIcon,
-  PackageSearchIcon,
   ChartBarIcon,
   FileWarningIcon,
   BookIcon,
@@ -27,6 +25,7 @@ import {
   Settings2Icon,
   CircleHelpIcon,
   SearchIcon,
+  Building2Icon,
 } from "lucide-react";
 
 const data = {
@@ -36,75 +35,23 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
-    {
-      title: "Flights",
-      url: "#",
-      icon: <PlaneTakeoffIcon />,
-    },
-    {
-      title: "Passengers",
-      url: "#",
-      icon: <UsersIcon />,
-    },
-    {
-      title: "Baggage",
-      url: "#",
-      icon: <LuggageIcon />,
-    },
-    {
-      title: "Gates & Terminals",
-      url: "#",
-      icon: <DoorOpenIcon />,
-    },
-    {
-      title: "Staff & Crew",
-      url: "#",
-      icon: <IdCardIcon />,
-    },
-    {
-      title: "Cargo & Logistics",
-      url: "#",
-      icon: <PackageSearchIcon />,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: <ChartBarIcon />,
-    },
+    { title: "Flights", url: "/flights", icon: PlaneTakeoffIcon },
+    { title: "Passengers", url: "/passengers", icon: UsersIcon },
+    { title: "Aircraft", url: "/aircraft", icon: PlaneTakeoffIcon },
+    { title: "Airlines", url: "/airlines", icon: Building2Icon },
+    { title: "Employees", url: "/employees", icon: IdCardIcon },
+    { title: "Airports", url: "/airports", icon: DoorOpenIcon },
+    { title: "Analytics", url: "/analytics", icon: ChartBarIcon },
   ],
   documents: [
-    {
-      name: "Incident Reports",
-      url: "#",
-      icon: <FileWarningIcon />,
-    },
-    {
-      name: "Operation Manuals",
-      url: "#",
-      icon: <BookIcon />,
-    },
-    {
-      name: "Documents Center",
-      url: "#",
-      icon: <FolderIcon />,
-    },
+    { name: "Incident Reports", url: "/reports", icon: FileWarningIcon },
+    { name: "Operation Manuals", url: "/manuals", icon: BookIcon },
+    { name: "Documents Center", url: "/documents", icon: FolderIcon },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: <Settings2Icon />,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: <CircleHelpIcon />,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: <SearchIcon />,
-    },
+    { title: "Settings", url: "/settings", icon: Settings2Icon },
+    { title: "Get Help", url: "/help", icon: CircleHelpIcon },
+    { title: "Search", url: "/search", icon: SearchIcon },
   ],
 };
 
@@ -114,17 +61,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-            >
-              <a href="#">
-                {/* <CommandIcon className="size-5!" /> */}
-                <img
-                  src="./src/assets/Logo.png"
-                  alt="logo"
-                  className="size-7!"
-                />
+            <SidebarMenuButton asChild className="p-1.5">
+              <a href="/">
+                <img src="./src/assets/Logo.png" alt="logo" className="size-7" />
                 <span className="text-base font-semibold">
                   Milkyway Airport
                 </span>
@@ -133,11 +72,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavDocuments items={data.documents} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
