@@ -1,4 +1,4 @@
-package main.java.com.airportmanagementsystem.airportmanagementsystem.config;
+package com.airportmanagementsystem.airportmanagementsystem.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -56,7 +56,6 @@ public class DataInitializer implements CommandLineRunner {
             adminEmployee.setName("System Administrator");
             adminEmployee.setEmail("admin@airport.com");
             adminEmployee.setPhone("0000000000");
-            adminEmployee.setPosition("Administrator");
             adminEmployee.setRole(adminRole);
             employeeRepository.save(adminEmployee);
             System.out.println("Created admin employee.");
