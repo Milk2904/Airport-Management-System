@@ -1,4 +1,4 @@
-package main.java.com.airportmanagementsystem.airportmanagementsystem.dto.response;
+package com.airportmanagementsystem.airportmanagementsystem.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;

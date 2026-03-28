@@ -1,4 +1,4 @@
-package main.java.com.airportmanagementsystem.airportmanagementsystem.config;
+package com.airportmanagementsystem.airportmanagementsystem.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
