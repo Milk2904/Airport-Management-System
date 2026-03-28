@@ -1,4 +1,5 @@
-package com.airportmanagementsystem.airportmanagementsystem.controller;
+package com.airportmanagementsystem.airportmanagementsystem.Controller;
+
 
 import java.util.List;
 

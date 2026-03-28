@@ -1,4 +1,4 @@
-package com.airportmanagementsystem.airportmanagementsystem.controller;
+package com.airportmanagementsystem.airportmanagementsystem.Controller;
 
 import com.airportmanagementsystem.airportmanagementsystem.dto.request.FlightScheduleRequest;
 import com.airportmanagementsystem.airportmanagementsystem.entity.FlightSchedule;

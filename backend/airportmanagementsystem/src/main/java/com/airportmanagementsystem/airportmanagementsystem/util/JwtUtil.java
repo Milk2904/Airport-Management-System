@@ -1,4 +1,4 @@
-package main.java.com.airportmanagementsystem.airportmanagementsystem.util;
+package com.airportmanagementsystem.airportmanagementsystem.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

@@ -1,4 +1,4 @@
-package main.java.com.airportmanagementsystem.airportmanagementsystem.config;
+package com.airportmanagementsystem.airportmanagementsystem.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

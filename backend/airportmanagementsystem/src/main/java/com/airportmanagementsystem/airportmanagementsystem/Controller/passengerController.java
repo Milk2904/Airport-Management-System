@@ -1,4 +1,5 @@
-package com.airportmanagementsystem.airportmanagementsystem.controller;
+package com.airportmanagementsystem.airportmanagementsystem.Controller;
+
 
 import com.airportmanagementsystem.airportmanagementsystem.entity.Passenger;
 import com.airportmanagementsystem.airportmanagementsystem.service.PassengerService;
