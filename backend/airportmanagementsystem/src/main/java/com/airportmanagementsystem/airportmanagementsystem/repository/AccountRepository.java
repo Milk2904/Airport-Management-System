@@ -9,4 +9,5 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     boolean existsByEmployee(Employee employee);
 
+    Account findByUsername(String username);
 }
