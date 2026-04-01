@@ -74,7 +74,6 @@ public class DataInitializer implements CommandLineRunner {
         Airport dad = airportRepository.findByCode("DAD").orElse(null);
         Airport phu = airportRepository.findByCode("PQC").orElse(null);
         Airport bkk = airportRepository.findByCode("BKK").orElse(null);
-        Airport sin = airportRepository.findByCode("SIN").orElse(null);
 
         // =====================================================================
         // 3. AIRLINES
@@ -113,7 +112,6 @@ public class DataInitializer implements CommandLineRunner {
         Aircraft ac2 = allAircrafts.size() > 1 ? allAircrafts.get(1) : ac1;
         Aircraft ac3 = allAircrafts.size() > 2 ? allAircrafts.get(2) : ac1;
         Aircraft ac4 = allAircrafts.size() > 3 ? allAircrafts.get(3) : ac1;
-        Aircraft ac5 = allAircrafts.size() > 4 ? allAircrafts.get(4) : ac1;
 
         // =====================================================================
         // 5. GATES

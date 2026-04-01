@@ -1,5 +1,6 @@
 package com.airportmanagementsystem.airportmanagementsystem.controller;
 
+
 import com.airportmanagementsystem.airportmanagementsystem.entity.Passenger;
 import com.airportmanagementsystem.airportmanagementsystem.service.PassengerService;
 import org.springframework.web.bind.annotation.*;
