@@ -29,16 +29,33 @@ export function LoginForm({
 
     try {
       const response = await login({ username, password });
-      const { token, username: userUsername, role, employeeId, employeeName } = response.data.result;
-
-      // Store token and user info in localStorage
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify({
+      const {
+        token,
+        accessToken,
+        refreshToken,
         username: userUsername,
         role,
         employeeId,
-        employeeName
-      }));
+        employeeName,
+      } = response.data.result;
+
+      const authToken = accessToken ?? token;
+
+      // Store token and user info in localStorage
+      localStorage.setItem("token", authToken);
+      localStorage.setItem("accessToken", authToken);
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+      }
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          username: userUsername,
+          role,
+          employeeId,
+          employeeName,
+        })
+      );
 
       toast.success("Login successful!");
       navigate("/dashboard");

@@ -1,4 +1,4 @@
-package com.airportmanagementsystem.airportmanagementsystem.controller;
+package com.airportmanagementsystem.airportmanagementsystem.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,6 +1,18 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { LoginForm } from "@/components/login-form";
 
 const LogInPage = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token =
+      localStorage.getItem("accessToken") || localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+
   return (
     <div
       className="flex min-h-svh flex-col items-center justify-center bg-cover bg-muted p-6 md:p-10"

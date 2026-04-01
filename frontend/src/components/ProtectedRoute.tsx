@@ -9,13 +9,15 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token =
+      localStorage.getItem("accessToken") || localStorage.getItem("token");
     if (!token) {
       navigate("/");
     }
   }, [navigate]);
 
-  const token = localStorage.getItem("token");
+  const token =
+    localStorage.getItem("accessToken") || localStorage.getItem("token");
   if (!token) {
     return null; // or a loading spinner
   }
