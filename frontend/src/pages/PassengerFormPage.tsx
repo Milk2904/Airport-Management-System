@@ -94,7 +94,7 @@ const PassengerFormPage = () => {
                           <Input
                             id="fullName"
                             name="fullName"
-                            value={formData.fullName}
+                            value={formData.fullName || ""}
                             onChange={handleChange}
                             required
                           />
@@ -105,7 +105,7 @@ const PassengerFormPage = () => {
                             id="email"
                             name="email"
                             type="email"
-                            value={formData.email}
+                            value={formData.email || ""}
                             onChange={handleChange}
                             required
                           />
@@ -115,7 +115,7 @@ const PassengerFormPage = () => {
                           <Input
                             id="phone"
                             name="phone"
-                            value={formData.phone}
+                            value={formData.phone || ""}
                             onChange={handleChange}
                             required
                           />
@@ -125,7 +125,7 @@ const PassengerFormPage = () => {
                           <Input
                             id="passportNumber"
                             name="passportNumber"
-                            value={formData.passportNumber}
+                            value={formData.passportNumber || ""}
                             onChange={handleChange}
                             required
                           />

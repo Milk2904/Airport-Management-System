@@ -92,7 +92,7 @@ const AirlineFormPage = () => {
                           <Input
                             id="airlineName"
                             name="airlineName"
-                            value={formData.airlineName}
+                            value={formData.airlineName || ""}
                             onChange={handleChange}
                             required
                           />
@@ -102,7 +102,7 @@ const AirlineFormPage = () => {
                           <Input
                             id="country"
                             name="country"
-                            value={formData.country}
+                            value={formData.country || ""}
                             onChange={handleChange}
                             required
                           />

@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/passengers")
-@CrossOrigin(origins = "*")
 public class PassengerController {
 
     private final PassengerService passengerService;

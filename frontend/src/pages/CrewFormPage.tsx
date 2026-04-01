@@ -9,33 +9,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { createSeat, getSeatById, updateSeat } from "@/service/SeatService";
+import { createCrew, getCrewById, updateCrew } from "@/service/CrewService";
 
-const SeatFormPage = () => {
+const CrewFormPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   
   const [formData, setFormData] = useState({
-    seatNumber: "",
-    seatClass: "ECONOMY",
-    status: "AVAILABLE",
-    aircraftId: "",
+    name: "",
+    role: "PILOT",
+    experienceYears: "",
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
-      getSeatById(Number(id)).then(res => {
-        // SeatController getById returns SeatResponse which should have seat properties
-        const t = res.data;
+      getCrewById(Number(id)).then(res => {
+        const c = res.data;
         setFormData({
-          seatNumber: t.seatNumber || "",
-          seatClass: t.seatClass || "ECONOMY",
-          status: t.status || "AVAILABLE",
-          aircraftId: t.aircraftId?.toString() || "", // check SeatResponse logic
+          name: c.name || "",
+          role: c.role || "PILOT",
+          experienceYears: c.experienceYears || "",
         });
-      }).catch(() => toast.error("Failed to fetch seat"));
+      }).catch(() => toast.error("Failed to fetch crew member"));
     }
   }, [id]);
 
@@ -44,23 +41,22 @@ const SeatFormPage = () => {
     setLoading(true);
 
     const payload = {
-      seatNumber: formData.seatNumber,
-      seatClass: formData.seatClass,
-      status: formData.status,
-      aircraftId: Number(formData.aircraftId),
+      name: formData.name,
+      role: formData.role,
+      experienceYears: Number(formData.experienceYears),
     };
 
     try {
       if (id) {
-        await updateSeat(Number(id), payload);
-        toast.success("Seat updated successfully");
+        await updateCrew(Number(id), payload);
+        toast.success("Crew member updated successfully");
       } else {
-        await createSeat(payload);
-        toast.success("Seat created successfully");
+        await createCrew(payload);
+        toast.success("Crew member created successfully");
       }
-      navigate("/seats");
+      navigate("/crew");
     } catch {
-      toast.error("Failed to save seat");
+      toast.error("Failed to save crew member");
     } finally {
       setLoading(false);
     }
@@ -90,51 +86,37 @@ const SeatFormPage = () => {
                 <div className="px-4 lg:px-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>{id ? "Edit Seat" : "Add Seat"}</CardTitle>
+                      <CardTitle>{id ? "Edit Crew Member" : "Add Crew Member"}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
                         <div>
-                          <Label htmlFor="seatNumber">Seat Number</Label>
-                          <Input type="text" id="seatNumber" name="seatNumber" value={formData.seatNumber || ""} onChange={handleChange} required />
+                          <Label htmlFor="name">Name</Label>
+                          <Input type="text" id="name" name="name" value={formData.name || ""} onChange={handleChange} required />
                         </div>
                         <div>
-                          <Label htmlFor="aircraftId">Aircraft ID</Label>
-                          <Input type="number" id="aircraftId" name="aircraftId" value={formData.aircraftId || ""} onChange={handleChange} required />
+                          <Label htmlFor="experienceYears">Experience (Years)</Label>
+                          <Input type="number" id="experienceYears" name="experienceYears" value={formData.experienceYears || ""} onChange={handleChange} required />
                         </div>
                         <div>
-                          <Label htmlFor="seatClass">Seat Class</Label>
+                          <Label htmlFor="role">Role</Label>
                           <select 
-                            id="seatClass" 
-                            name="seatClass" 
-                            value={formData.seatClass} 
+                            id="role" 
+                            name="role" 
+                            value={formData.role} 
                             onChange={handleChange} 
                             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                           >
-                            <option value="ECONOMY">ECONOMY</option>
-                            <option value="BUSINESS">BUSINESS</option>
-                            <option value="FIRST_CLASS">FIRST_CLASS</option>
-                          </select>
-                        </div>
-                        <div>
-                          <Label htmlFor="status">Status</Label>
-                          <select 
-                            id="status" 
-                            name="status" 
-                            value={formData.status} 
-                            onChange={handleChange} 
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                          >
-                            <option value="AVAILABLE">AVAILABLE</option>
-                            <option value="BOOKED">BOOKED</option>
-                            <option value="MAINTENANCE">MAINTENANCE</option>
+                            <option value="PILOT">PILOT</option>
+                            <option value="FLIGHT_ATTENDANT">FLIGHT ATTENDANT</option>
+                            <option value="GROUND_STAFF">GROUND STAFF</option>
                           </select>
                         </div>
                         <div className="flex gap-2 pt-4">
                           <Button type="submit" disabled={loading}>
                             {loading ? "Saving..." : "Save"}
                           </Button>
-                          <Button variant="outline" onClick={() => navigate("/seats")}>Cancel</Button>
+                          <Button variant="outline" onClick={() => navigate("/crew")}>Cancel</Button>
                         </div>
                       </form>
                     </CardContent>
@@ -149,4 +131,4 @@ const SeatFormPage = () => {
   );
 };
 
-export default SeatFormPage;
+export default CrewFormPage;

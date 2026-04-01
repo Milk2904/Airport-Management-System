@@ -9,33 +9,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { createSeat, getSeatById, updateSeat } from "@/service/SeatService";
+import { createBaggage, getBaggageById, updateBaggage } from "@/service/BaggageService";
 
-const SeatFormPage = () => {
+const BaggageFormPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   
   const [formData, setFormData] = useState({
-    seatNumber: "",
-    seatClass: "ECONOMY",
-    status: "AVAILABLE",
-    aircraftId: "",
+    ticket: { ticketId: "" },
+    weight: "",
+    type: "CHECKED",
+    status: "CHECKED_IN",
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
-      getSeatById(Number(id)).then(res => {
-        // SeatController getById returns SeatResponse which should have seat properties
+      getBaggageById(Number(id)).then(res => {
         const t = res.data;
         setFormData({
-          seatNumber: t.seatNumber || "",
-          seatClass: t.seatClass || "ECONOMY",
-          status: t.status || "AVAILABLE",
-          aircraftId: t.aircraftId?.toString() || "", // check SeatResponse logic
+          ticket: { ticketId: t.ticket?.ticketId || "" },
+          weight: t.weight || "",
+          type: t.type || "CHECKED",
+          status: t.status || "CHECKED_IN",
         });
-      }).catch(() => toast.error("Failed to fetch seat"));
+      }).catch(() => toast.error("Failed to fetch baggage"));
     }
   }, [id]);
 
@@ -44,23 +43,23 @@ const SeatFormPage = () => {
     setLoading(true);
 
     const payload = {
-      seatNumber: formData.seatNumber,
-      seatClass: formData.seatClass,
+      ticket: { ticketId: Number(formData.ticket.ticketId) },
+      weight: Number(formData.weight),
+      type: formData.type,
       status: formData.status,
-      aircraftId: Number(formData.aircraftId),
     };
 
     try {
       if (id) {
-        await updateSeat(Number(id), payload);
-        toast.success("Seat updated successfully");
+        await updateBaggage(Number(id), payload);
+        toast.success("Baggage updated successfully");
       } else {
-        await createSeat(payload);
-        toast.success("Seat created successfully");
+        await createBaggage(payload);
+        toast.success("Baggage created successfully");
       }
-      navigate("/seats");
+      navigate("/baggage");
     } catch {
-      toast.error("Failed to save seat");
+      toast.error("Failed to save baggage");
     } finally {
       setLoading(false);
     }
@@ -68,7 +67,11 @@ const SeatFormPage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === "ticketId") {
+      setFormData(prev => ({ ...prev, ticket: { ticketId: value } }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   return (
@@ -90,30 +93,29 @@ const SeatFormPage = () => {
                 <div className="px-4 lg:px-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>{id ? "Edit Seat" : "Add Seat"}</CardTitle>
+                      <CardTitle>{id ? "Edit Baggage" : "Add Baggage"}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
                         <div>
-                          <Label htmlFor="seatNumber">Seat Number</Label>
-                          <Input type="text" id="seatNumber" name="seatNumber" value={formData.seatNumber || ""} onChange={handleChange} required />
+                          <Label htmlFor="ticketId">Ticket ID</Label>
+                          <Input type="number" id="ticketId" name="ticketId" value={formData.ticket.ticketId || ""} onChange={handleChange} required />
                         </div>
                         <div>
-                          <Label htmlFor="aircraftId">Aircraft ID</Label>
-                          <Input type="number" id="aircraftId" name="aircraftId" value={formData.aircraftId || ""} onChange={handleChange} required />
+                          <Label htmlFor="weight">Weight (kg)</Label>
+                          <Input type="number" step="0.1" id="weight" name="weight" value={formData.weight || ""} onChange={handleChange} required />
                         </div>
                         <div>
-                          <Label htmlFor="seatClass">Seat Class</Label>
+                          <Label htmlFor="type">Type</Label>
                           <select 
-                            id="seatClass" 
-                            name="seatClass" 
-                            value={formData.seatClass} 
+                            id="type" 
+                            name="type" 
+                            value={formData.type} 
                             onChange={handleChange} 
                             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                           >
-                            <option value="ECONOMY">ECONOMY</option>
-                            <option value="BUSINESS">BUSINESS</option>
-                            <option value="FIRST_CLASS">FIRST_CLASS</option>
+                            <option value="CARRY_ON">CARRY ON</option>
+                            <option value="CHECKED">CHECKED</option>
                           </select>
                         </div>
                         <div>
@@ -125,16 +127,17 @@ const SeatFormPage = () => {
                             onChange={handleChange} 
                             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                           >
-                            <option value="AVAILABLE">AVAILABLE</option>
-                            <option value="BOOKED">BOOKED</option>
-                            <option value="MAINTENANCE">MAINTENANCE</option>
+                            <option value="CHECKED_IN">CHECKED_IN</option>
+                            <option value="LOADED">LOADED</option>
+                            <option value="CLAIMED">CLAIMED</option>
+                            <option value="LOST">LOST</option>
                           </select>
                         </div>
                         <div className="flex gap-2 pt-4">
                           <Button type="submit" disabled={loading}>
                             {loading ? "Saving..." : "Save"}
                           </Button>
-                          <Button variant="outline" onClick={() => navigate("/seats")}>Cancel</Button>
+                          <Button variant="outline" onClick={() => navigate("/baggage")}>Cancel</Button>
                         </div>
                       </form>
                     </CardContent>
@@ -149,4 +152,4 @@ const SeatFormPage = () => {
   );
 };
 
-export default SeatFormPage;
+export default BaggageFormPage;

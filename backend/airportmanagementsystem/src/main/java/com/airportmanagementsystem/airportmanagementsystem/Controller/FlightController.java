@@ -1,5 +1,6 @@
 package com.airportmanagementsystem.airportmanagementsystem.controller;
 
+import com.airportmanagementsystem.airportmanagementsystem.annotation.RoleRequired;
 import com.airportmanagementsystem.airportmanagementsystem.entity.Flight;
 import com.airportmanagementsystem.airportmanagementsystem.service.FlightService;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class FlightController {
     }
 
     @PostMapping
+    @RoleRequired({"ADMIN"})
     public Flight create(
             @RequestBody Flight flight,
             @RequestParam Long departureId,
@@ -36,11 +38,13 @@ public class FlightController {
     }
 
     @PutMapping("/{id}")
+    @RoleRequired({"ADMIN"})
     public Flight update(@PathVariable Long id, @RequestBody Flight flight) {
         return flightService.update(id, flight);
     }
 
     @DeleteMapping("/{id}")
+    @RoleRequired({"ADMIN"})
     public String delete(@PathVariable Long id) {
         flightService.delete(id);
         return "Deleted flight " + id;

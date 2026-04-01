@@ -32,6 +32,18 @@ import TicketFormPage from "./pages/TicketFormPage";
 import SeatPage from "./pages/SeatPage";
 import SeatFormPage from "./pages/SeatFormPage";
 
+import BaggagePage from "./pages/BaggagePage";
+import BaggageFormPage from "./pages/BaggageFormPage";
+
+import CrewPage from "./pages/CrewPage";
+import CrewFormPage from "./pages/CrewFormPage";
+
+import GatePage from "./pages/GatePage";
+import GateFormPage from "./pages/GateFormPage";
+
+import FlightSchedulePage from "./pages/FlightSchedulePage";
+import FlightScheduleFormPage from "./pages/FlightScheduleFormPage";
+
 function App() {
   return (
     <>
@@ -72,6 +84,22 @@ function App() {
           {/* Seat Routes */}
           <Route path="/seats" element={<ProtectedRoute><SeatPage /></ProtectedRoute>} />
           <Route path="/seats/form" element={<ProtectedRoute><SeatFormPage /></ProtectedRoute>} />
+
+          {/* Baggage Routes */}
+          <Route path="/baggage" element={<ProtectedRoute><BaggagePage /></ProtectedRoute>} />
+          <Route path="/baggage/form" element={<ProtectedRoute><BaggageFormPage /></ProtectedRoute>} />
+
+          {/* Crew Routes */}
+          <Route path="/crew" element={<ProtectedRoute><CrewPage /></ProtectedRoute>} />
+          <Route path="/crew/form" element={<ProtectedRoute><CrewFormPage /></ProtectedRoute>} />
+
+          {/* Gate Routes */}
+          <Route path="/gates" element={<ProtectedRoute><GatePage /></ProtectedRoute>} />
+          <Route path="/gates/form" element={<ProtectedRoute><GateFormPage /></ProtectedRoute>} />
+
+          {/* Flight Schedule Routes */}
+          <Route path="/flight-schedules" element={<ProtectedRoute><FlightSchedulePage /></ProtectedRoute>} />
+          <Route path="/flight-schedules/form" element={<ProtectedRoute><FlightScheduleFormPage /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </>

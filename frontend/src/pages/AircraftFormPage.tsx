@@ -136,7 +136,7 @@ const AircraftFormPage = () => {
                           <Input
                             id="model"
                             name="model"
-                            value={formData.model}
+                            value={formData.model || ""}
                             onChange={handleChange}
                             required
                           />
@@ -165,7 +165,7 @@ const AircraftFormPage = () => {
                             id="capacity"
                             name="capacity"
                             type="number"
-                            value={formData.capacity}
+                            value={formData.capacity || ""}
                             onChange={handleChange}
                             required
                           />
@@ -176,7 +176,7 @@ const AircraftFormPage = () => {
                             id="manufactureYear"
                             name="manufactureYear"
                             type="number"
-                            value={formData.manufactureYear}
+                            value={formData.manufactureYear || ""}
                             onChange={handleChange}
                             required
                           />

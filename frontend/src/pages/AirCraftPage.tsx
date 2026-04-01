@@ -11,7 +11,14 @@ import { Plus } from "lucide-react";
 
 const AirCraftPage = () => {
   const navigate = useNavigate();
-  const [aircrafts, setAircrafts] = useState([]);
+  const [aircrafts, setAircrafts] = useState<{
+    aircraftId: number;
+    model: string;
+    airline: { name: string };
+    capacity: number;
+    manufactureYear: number;
+    status: string;
+  }[]>([]);
 
   const handleEdit = (id: number) => {
     navigate(`/aircraft/form?id=${id}`);
@@ -24,13 +31,17 @@ const AirCraftPage = () => {
   const remove = async (id: number) => {
     await deleteAircraft(id);
     const res = await getAircrafts();
-    setAircrafts(res.data);
+    setAircrafts(Array.isArray(res.data) ? res.data : []);
   };
 
   useEffect(() => {
     (async () => {
-      const res = await getAircrafts();
-      setAircrafts(res.data);
+      try {
+        const res = await getAircrafts();
+        setAircrafts(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        console.error("Failed to fetch aircrafts", error);
+      }
     })();
   }, []);
 

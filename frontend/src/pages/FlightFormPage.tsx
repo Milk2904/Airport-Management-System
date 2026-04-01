@@ -57,14 +57,21 @@ const FlightFormPage = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const airportsRes = await getAirports();
-        const airlinesRes = await getAirlines();
-        const aircraftsRes = await getAircrafts();
-        setAirports(airportsRes.data);
-        setAirlines(airlinesRes.data);
-        setAircrafts(aircraftsRes.data);
-      } catch {
-        // Handle error silently
+        const [airportsRes, airlinesRes, aircraftsRes] = await Promise.all([
+          getAirports(),
+          getAirlines(),
+          getAircrafts()
+        ]);
+
+        const airportsData = airportsRes.data?.result ?? airportsRes.data;
+        const airlinesData = airlinesRes.data?.result ?? airlinesRes.data;
+        const aircraftsData = aircraftsRes.data?.result ?? aircraftsRes.data;
+
+        setAirports(Array.isArray(airportsData) ? airportsData : []);
+        setAirlines(Array.isArray(airlinesData) ? airlinesData : []);
+        setAircrafts(Array.isArray(aircraftsData) ? aircraftsData : []);
+      } catch (error) {
+        console.error("Failed to load initial data:", error);
       }
     };
     loadData();
@@ -75,7 +82,8 @@ const FlightFormPage = () => {
       const loadFlight = async () => {
         try {
           const res = await getFlightById(parseInt(id));
-          setFormData(res.data);
+          const data = res.data?.result ?? res.data;
+          setFormData(data);
         } catch {
           toast.error("Failed to load flight");
           navigate("/flights");
@@ -179,7 +187,7 @@ const FlightFormPage = () => {
                           <Input
                             id="flightNumber"
                             name="flightNumber"
-                            value={formData.flightNumber}
+                            value={formData.flightNumber || ""}
                             onChange={handleChange}
                             required
                           />
@@ -194,7 +202,7 @@ const FlightFormPage = () => {
                               <SelectValue placeholder="Select departure airport" />
                             </SelectTrigger>
                             <SelectContent>
-                              {airports.map((airport) => (
+                              {Array.isArray(airports) && airports.map((airport) => (
                                 <SelectItem key={airport.airportId} value={airport.airportId.toString()}>
                                   {airport.name}
                                 </SelectItem>
@@ -212,7 +220,7 @@ const FlightFormPage = () => {
                               <SelectValue placeholder="Select arrival airport" />
                             </SelectTrigger>
                             <SelectContent>
-                              {airports.map((airport) => (
+                              {Array.isArray(airports) && airports.map((airport) => (
                                 <SelectItem key={airport.airportId} value={airport.airportId.toString()}>
                                   {airport.name}
                                 </SelectItem>
@@ -230,7 +238,7 @@ const FlightFormPage = () => {
                               <SelectValue placeholder="Select airline" />
                             </SelectTrigger>
                             <SelectContent>
-                              {airlines.map((airline) => (
+                              {Array.isArray(airlines) && airlines.map((airline) => (
                                 <SelectItem key={airline.airlineId} value={airline.airlineId.toString()}>
                                   {airline.airlineName}
                                 </SelectItem>
@@ -248,7 +256,7 @@ const FlightFormPage = () => {
                               <SelectValue placeholder="Select aircraft" />
                             </SelectTrigger>
                             <SelectContent>
-                              {aircrafts.map((aircraft) => (
+                              {Array.isArray(aircrafts) && aircrafts.map((aircraft) => (
                                 <SelectItem key={aircraft.aircraftId} value={aircraft.aircraftId.toString()}>
                                   {aircraft.model}
                                 </SelectItem>
@@ -262,7 +270,7 @@ const FlightFormPage = () => {
                             id="duration"
                             name="duration"
                             type="number"
-                            value={formData.duration}
+                            value={formData.duration || ""}
                             onChange={handleChange}
                             required
                           />

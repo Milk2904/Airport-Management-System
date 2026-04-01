@@ -30,8 +30,6 @@ public class AircraftService {
 
         if (data.getAirline() != null)
             aircraft.setAirline(data.getAirline());
-        if (data.getAirline() != null)
-            aircraft.setAirline(data.getAirline());
         if (data.getModel() != null)
             aircraft.setModel(data.getModel());
         if (data.getCapacity() != null)
