@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
@@ -9,6 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { createTicket, getTicketById, updateTicket } from "@/service/TicketService";
+
+// For dropdowns, ideally we load passengers, schedules, seats and employees. Let's use simple inputs for the IDs for brevity.
+// In a production scenario, these would be robust async search selects.
 
 const TicketFormPage = () => {
   const navigate = useNavigate();
@@ -16,20 +20,52 @@ const TicketFormPage = () => {
   const id = searchParams.get("id");
   
   const [formData, setFormData] = useState({
-    ticketNumber: "",
-    seatNumber: "",
-    flightNumber: "",
-    passengerName: "",
+    passengerId: "",
+    scheduleId: "",
+    seatId: "",
+    employeeId: "",
+    price: "",
+    status: "CONFIRMED",
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      getTicketById(Number(id)).then(res => {
+        const t = res.data;
+        setFormData({
+          passengerId: t.passenger?.passengerId || "",
+          scheduleId: t.schedule?.scheduleId || "",
+          seatId: t.seat?.seatId || "",
+          employeeId: t.employee?.employeeId || "",
+          price: t.price || "",
+          status: t.status || "CONFIRMED",
+        });
+      }).catch(() => toast.error("Failed to fetch ticket"));
+    }
+  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
+    const payload = {
+      passengerId: Number(formData.passengerId),
+      scheduleId: Number(formData.scheduleId),
+      seatId: Number(formData.seatId),
+      employeeId: Number(formData.employeeId),
+      price: Number(formData.price),
+      status: formData.status,
+    };
+
     try {
-      // TODO: Implement create/update Ticket API calls
-      toast.success(id ? "Ticket updated successfully" : "Ticket created successfully");
+      if (id) {
+        await updateTicket(Number(id), payload);
+        toast.success("Ticket updated successfully");
+      } else {
+        await createTicket(payload);
+        toast.success("Ticket created successfully");
+      }
       navigate("/tickets");
     } catch {
       toast.error("Failed to save ticket");
@@ -38,12 +74,9 @@ const TicketFormPage = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -70,52 +103,44 @@ const TicketFormPage = () => {
                     <CardContent>
                       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
                         <div>
-                          <Label htmlFor="ticketNumber">Ticket Number</Label>
-                          <Input
-                            id="ticketNumber"
-                            name="ticketNumber"
-                            value={formData.ticketNumber}
-                            onChange={handleChange}
-                            required
-                          />
+                          <Label htmlFor="passengerId">Passenger ID</Label>
+                          <Input type="number" id="passengerId" name="passengerId" value={formData.passengerId || ""} onChange={handleChange} required />
                         </div>
                         <div>
-                          <Label htmlFor="seatNumber">Seat Number</Label>
-                          <Input
-                            id="seatNumber"
-                            name="seatNumber"
-                            value={formData.seatNumber}
-                            onChange={handleChange}
-                            required
-                          />
+                          <Label htmlFor="scheduleId">Schedule ID</Label>
+                          <Input type="number" id="scheduleId" name="scheduleId" value={formData.scheduleId || ""} onChange={handleChange} required />
                         </div>
                         <div>
-                          <Label htmlFor="flightNumber">Flight Number</Label>
-                          <Input
-                            id="flightNumber"
-                            name="flightNumber"
-                            value={formData.flightNumber}
-                            onChange={handleChange}
-                            required
-                          />
+                          <Label htmlFor="seatId">Seat ID</Label>
+                          <Input type="number" id="seatId" name="seatId" value={formData.seatId || ""} onChange={handleChange} required />
                         </div>
                         <div>
-                          <Label htmlFor="passengerName">Passenger Name</Label>
-                          <Input
-                            id="passengerName"
-                            name="passengerName"
-                            value={formData.passengerName}
-                            onChange={handleChange}
-                            required
-                          />
+                          <Label htmlFor="employeeId">Employee ID</Label>
+                          <Input type="number" id="employeeId" name="employeeId" value={formData.employeeId || ""} onChange={handleChange} required />
+                        </div>
+                        <div>
+                          <Label htmlFor="price">Price ($)</Label>
+                          <Input type="number" step="0.01" id="price" name="price" value={formData.price || ""} onChange={handleChange} required />
+                        </div>
+                        <div>
+                          <Label htmlFor="status">Status</Label>
+                          <select 
+                            id="status" 
+                            name="status" 
+                            value={formData.status} 
+                            onChange={handleChange} 
+                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <option value="CONFIRMED">CONFIRMED</option>
+                            <option value="CANCELLED">CANCELLED</option>
+                            <option value="PENDING">PENDING</option>
+                          </select>
                         </div>
                         <div className="flex gap-2 pt-4">
                           <Button type="submit" disabled={loading}>
                             {loading ? "Saving..." : "Save"}
                           </Button>
-                          <Button variant="outline" onClick={() => navigate("/tickets")}>
-                            Cancel
-                          </Button>
+                          <Button variant="outline" onClick={() => navigate("/tickets")}>Cancel</Button>
                         </div>
                       </form>
                     </CardContent>

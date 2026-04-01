@@ -1,4 +1,4 @@
-package com.airportmanagementsystem.airportmanagementsystem.Controller;
+package com.airportmanagementsystem.airportmanagementsystem.controller;
 
 
 import com.airportmanagementsystem.airportmanagementsystem.entity.Crew;
@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/crew")
-@CrossOrigin(origins = "*")
 public class CrewController {
 
     private final CrewService service;

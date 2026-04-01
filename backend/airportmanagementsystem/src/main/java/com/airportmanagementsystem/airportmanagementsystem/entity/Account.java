@@ -1,5 +1,7 @@
 package com.airportmanagementsystem.airportmanagementsystem.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +25,7 @@ public class Account {
 
     @OneToOne
     @JoinColumn(name = "employee_id", unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Employee employee;
 
     @Column(unique = true)

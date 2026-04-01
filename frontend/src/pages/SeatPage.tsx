@@ -7,26 +7,31 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
+import { getSeats, deleteSeat } from "@/service/SeatService";
 
 interface Seat {
-  id: number;
+  seatId: number;
   seatNumber: string;
   seatClass: string;
-  aircraft: string;
-  isAvailable: boolean;
+  status: string;
+  aircraft: { aircraftId: number; model: string };
 }
 
 const SeatPage = () => {
   const navigate = useNavigate();
-  const [seats] = useState<Seat[]>([]);
+  const [seats, setSeats] = useState<Seat[]>([]);
 
-  // TODO: Load seats when API is ready
+  const loadSeats = async () => {
+    try {
+      const res = await getSeats();
+      setSeats(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      console.error("Failed to fetch seats", error);
+    }
+  };
+
   useEffect(() => {
-    // const loadSeats = async () => {
-    //   const res = await getSeats();
-    //   setSeats(res.data);
-    // };
-    // loadSeats();
+    loadSeats();
   }, []);
 
   const handleEdit = (id: number) => {
@@ -37,9 +42,15 @@ const SeatPage = () => {
     navigate("/seats/form");
   };
 
-  const handleDelete = (id: number) => {
-    // TODO: Implement delete when API is ready
-    console.log("Delete seat:", id);
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this seat?")) {
+      try {
+        await deleteSeat(id);
+        loadSeats();
+      } catch (error) {
+        console.error("Failed to delete seat", error);
+      }
+    }
   };
 
   return (
@@ -68,13 +79,13 @@ const SeatPage = () => {
                       </Button>
                     </CardHeader>
                     <CardContent>
-                      <table className="w-full text-left mt-4">
+                      <table className="w-full text-left mt-4 border-collapse">
                         <thead>
                           <tr className="border-b">
                             <th className="p-2">Seat Number</th>
-                            <th className="p-2">Class</th>
                             <th className="p-2">Aircraft</th>
-                            <th className="p-2">Available</th>
+                            <th className="p-2">Class</th>
+                            <th className="p-2">Status</th>
                             <th className="p-2">Actions</th>
                           </tr>
                         </thead>
@@ -86,29 +97,27 @@ const SeatPage = () => {
                               </td>
                             </tr>
                           ) : (
-                            seats.map((s) => {
-                              const seat = s as { id: number; seatNumber: string; seatClass: string; aircraft: string; isAvailable: boolean };
-                              return (
-                                <tr key={seat.id} className="border-b">
-                                  <td className="p-2">{seat.seatNumber}</td>
-                                  <td className="p-2">{seat.seatClass}</td>
-                                  <td className="p-2">{seat.aircraft}</td>
-                                  <td className="p-2">{seat.isAvailable ? "Yes" : "No"}</td>
-                                  <td className="p-2">
-                                    <Button variant="outline" onClick={() => handleEdit(seat.id)}>
-                                      Edit
-                                    </Button>
-                                    <Button
-                                      className="ml-2"
-                                      variant="destructive"
-                                      onClick={() => handleDelete(seat.id)}
-                                    >
-                                      Delete
-                                    </Button>
-                                  </td>
-                                </tr>
-                              );
-                            })
+                            seats.map((seat) => (
+                              <tr key={seat.seatId} className="border-b">
+                                <td className="p-2">{seat.seatNumber}</td>
+                                <td className="p-2">{seat.aircraft?.model} (ID: {seat.aircraft?.aircraftId})</td>
+                                <td className="p-2">{seat.seatClass}</td>
+                                <td className="p-2">{seat.status}</td>
+                                <td className="p-2">
+                                  <Button variant="outline" size="sm" onClick={() => handleEdit(seat.seatId)}>
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    className="ml-2"
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleDelete(seat.seatId)}
+                                  >
+                                    Delete
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))
                           )}
                         </tbody>
                       </table>

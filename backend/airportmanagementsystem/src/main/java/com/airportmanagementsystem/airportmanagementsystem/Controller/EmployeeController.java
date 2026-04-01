@@ -1,4 +1,4 @@
-package com.airportmanagementsystem.airportmanagementsystem.Controller;
+package com.airportmanagementsystem.airportmanagementsystem.controller;
 
 
 import com.airportmanagementsystem.airportmanagementsystem.dto.request.EmployeeRequest;
@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/employees")
-@CrossOrigin(origins = "*")
 public class EmployeeController {
 
     private final EmployeeService employeeService;

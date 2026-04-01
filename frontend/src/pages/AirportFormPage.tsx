@@ -94,7 +94,7 @@ const AirportFormPage = () => {
                           <Input
                             id="code"
                             name="code"
-                            value={formData.code}
+                            value={formData.code || ""}
                             onChange={handleChange}
                             required
                           />
@@ -104,7 +104,7 @@ const AirportFormPage = () => {
                           <Input
                             id="name"
                             name="name"
-                            value={formData.name}
+                            value={formData.name || ""}
                             onChange={handleChange}
                             required
                           />
@@ -114,7 +114,7 @@ const AirportFormPage = () => {
                           <Input
                             id="city"
                             name="city"
-                            value={formData.city}
+                            value={formData.city || ""}
                             onChange={handleChange}
                             required
                           />
@@ -124,7 +124,7 @@ const AirportFormPage = () => {
                           <Input
                             id="country"
                             name="country"
-                            value={formData.country}
+                            value={formData.country || ""}
                             onChange={handleChange}
                             required
                           />

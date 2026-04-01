@@ -1,4 +1,4 @@
-package com.airportmanagementsystem.airportmanagementsystem.Controller;
+package com.airportmanagementsystem.airportmanagementsystem.controller;
 
 import com.airportmanagementsystem.airportmanagementsystem.dto.request.TicketRequest;
 import com.airportmanagementsystem.airportmanagementsystem.entity.Ticket;
@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/tickets")
-@CrossOrigin(origins = "*")
 public class TicketController {
 
     private final TicketService ticketService;

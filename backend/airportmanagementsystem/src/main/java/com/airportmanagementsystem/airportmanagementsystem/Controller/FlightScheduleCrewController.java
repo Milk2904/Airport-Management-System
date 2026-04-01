@@ -1,4 +1,4 @@
-package com.airportmanagementsystem.airportmanagementsystem.Controller;
+package com.airportmanagementsystem.airportmanagementsystem.controller;
 
 
 import com.airportmanagementsystem.airportmanagementsystem.dto.request.FlightScheduleCrewRequest;
@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/schedule-crew")
-@CrossOrigin(origins = "*")
+@RequestMapping("/schedule-crews")
 public class FlightScheduleCrewController {
 
     private final FlightScheduleCrewService service;

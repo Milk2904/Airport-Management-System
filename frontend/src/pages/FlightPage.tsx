@@ -9,9 +9,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 
+interface Flight {
+  flightId: number;
+  flightNumber: string;
+  departureAirport: { name: string };
+  arrivalAirport: { name: string };
+  airline: { name: string };
+  aircraft: { model: string };
+  duration: number;
+}
+
 const FlightPage = () => {
   const navigate = useNavigate();
-  const [flights, setFlights] = useState([]);
+  const [flights, setFlights] = useState<Flight[]>([]);
 
   const handleEdit = (id: number) => {
     navigate(`/flights/form?id=${id}`);
@@ -22,15 +32,28 @@ const FlightPage = () => {
   };
 
   const remove = async (id: number) => {
-    await deleteFlight(id);
-    const res = await getFlights();
-    setFlights(res.data);
+    try {
+      await deleteFlight(id);
+      const res = await getFlights();
+      // Handle both direct array response and ApiResponse wrapper
+      const data = res.data?.result ?? res.data;
+      setFlights(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Failed to delete flight:", error);
+    }
   };
 
   useEffect(() => {
     (async () => {
-      const res = await getFlights();
-      setFlights(res.data);
+      try {
+        const res = await getFlights();
+        // Handle both direct array response and ApiResponse wrapper
+        const data = res.data?.result ?? res.data;
+        setFlights(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch flights:", error);
+        setFlights([]);
+      }
     })();
   }, []);
 
@@ -73,21 +96,13 @@ const FlightPage = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {flights.map((f: {
-                            flightId: number;
-                            flightNumber: string;
-                            departureAirport: { name: string };
-                            arrivalAirport: { name: string };
-                            airline: { name: string };
-                            aircraft: { model: string };
-                            duration: number;
-                          }) => (
+                          {flights.map((f) => (
                             <tr key={f.flightId} className="border-b">
                               <td className="p-2">{f.flightNumber}</td>
-                              <td className="p-2">{f.departureAirport?.name}</td>
-                              <td className="p-2">{f.arrivalAirport?.name}</td>
-                              <td className="p-2">{f.airline?.name}</td>
-                              <td className="p-2">{f.aircraft?.model}</td>
+                              <td className="p-2">{f.departureAirport?.name || "N/A"}</td>
+                              <td className="p-2">{f.arrivalAirport?.name || "N/A"}</td>
+                              <td className="p-2">{f.airline?.name || "N/A"}</td>
+                              <td className="p-2">{f.aircraft?.model || "N/A"}</td>
                               <td className="p-2">{f.duration}</td>
                               <td className="p-2">
                                 <Button variant="outline" onClick={() => handleEdit(f.flightId)}>Edit</Button>

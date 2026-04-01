@@ -11,7 +11,13 @@ import { Plus } from "lucide-react";
 
 const PassengerPage = () => {
   const navigate = useNavigate();
-  const [passengers, setPassengers] = useState([]);
+  const [passengers, setPassengers] = useState<{
+    passengerId: number;
+    fullName: string;
+    email: string;
+    phone: string;
+    passportNumber: string;
+  }[]>([]);
 
   const handleEdit = (id: number) => {
     navigate(`/passengers/form?id=${id}`);
@@ -22,15 +28,23 @@ const PassengerPage = () => {
   };
 
   const remove = async (id: number) => {
-    await deletePassenger(id);
-    const res = await getPassengers();
-    setPassengers(res.data);
+    try {
+      await deletePassenger(id);
+      const res = await getPassengers();
+      setPassengers(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      console.error("Failed to delete passenger", error);
+    }
   };
 
   useEffect(() => {
     (async () => {
-      const res = await getPassengers();
-      setPassengers(res.data);
+      try {
+        const res = await getPassengers();
+        setPassengers(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        console.error("Failed to fetch passengers", error);
+      }
     })();
   }, []);
 

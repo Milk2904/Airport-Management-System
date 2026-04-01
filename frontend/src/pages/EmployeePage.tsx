@@ -11,7 +11,14 @@ import { Plus } from "lucide-react";
 
 const EmployeePage = () => {
   const navigate = useNavigate();
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState<{
+    employeeId: number;
+    name: string;
+    email: string;
+    phone: string;
+    airport: { name: string };
+    role: { roleName: string };
+  }[]>([]);
 
   const handleEdit = (id: number) => {
     navigate(`/employees/form?id=${id}`);
@@ -22,15 +29,23 @@ const EmployeePage = () => {
   };
 
   const remove = async (id: number) => {
-    await deleteEmployee(id);
-    const res = await getEmployees();
-    setEmployees(res.data);
+    try {
+      await deleteEmployee(id);
+      const res = await getEmployees();
+      setEmployees(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      console.error("Failed to delete employee", error);
+    }
   };
 
   useEffect(() => {
     (async () => {
-      const res = await getEmployees();
-      setEmployees(res.data);
+      try {
+        const res = await getEmployees();
+        setEmployees(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        console.error("Failed to fetch employees", error);
+      }
     })();
   }, []);
 

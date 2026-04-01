@@ -66,12 +66,21 @@ const EmployeeFormPage = () => {
     e.preventDefault();
     setLoading(true);
 
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      airportId: formData.airport?.airportId ? Number(formData.airport.airportId) : null,
+      roleId: formData.role?.roleId ? Number(formData.role.roleId) : null,
+      status: "ACTIVE" // Assuming a default if not in form
+    };
+
     try {
       if (id) {
-        await updateEmployee(parseInt(id), formData);
+        await updateEmployee(parseInt(id), payload);
         toast.success("Employee updated successfully");
       } else {
-        await createEmployee(formData);
+        await createEmployee(payload);
         toast.success("Employee created successfully");
       }
       navigate("/employees");
@@ -132,7 +141,7 @@ const EmployeeFormPage = () => {
                           <Input
                             id="name"
                             name="name"
-                            value={formData.name}
+                            value={formData.name || ""}
                             onChange={handleChange}
                             required
                           />
@@ -143,7 +152,7 @@ const EmployeeFormPage = () => {
                             id="email"
                             name="email"
                             type="email"
-                            value={formData.email}
+                            value={formData.email || ""}
                             onChange={handleChange}
                             required
                           />
@@ -153,7 +162,7 @@ const EmployeeFormPage = () => {
                           <Input
                             id="phone"
                             name="phone"
-                            value={formData.phone}
+                            value={formData.phone || ""}
                             onChange={handleChange}
                             required
                           />

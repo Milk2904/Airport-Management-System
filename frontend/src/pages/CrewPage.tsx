@@ -7,49 +7,47 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
-import { getTickets, deleteTicket } from "@/service/TicketService";
+import { getCrews, deleteCrew } from "@/service/CrewService";
 
-interface Ticket {
-  ticketId: number;
-  passenger: { name: string };
-  schedule: { scheduleId: number };
-  seat: { seatNumber: string };
-  price: number;
-  status: string;
+interface Crew {
+  crewId: number;
+  name: string;
+  role: string;
+  experienceYears: number;
 }
 
-const TicketPage = () => {
+const CrewPage = () => {
   const navigate = useNavigate();
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [crews, setCrews] = useState<Crew[]>([]);
 
-  const loadTickets = async () => {
+  const loadCrews = async () => {
     try {
-      const res = await getTickets();
-      setTickets(Array.isArray(res.data) ? res.data : []);
+      const res = await getCrews();
+      setCrews(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
-      console.error("Failed to fetch tickets", error);
+      console.error("Failed to fetch crew", error);
     }
   };
 
   useEffect(() => {
-    loadTickets();
+    loadCrews();
   }, []);
 
   const handleEdit = (id: number) => {
-    navigate(`/tickets/form?id=${id}`);
+    navigate(`/crew/form?id=${id}`);
   };
 
   const handleAdd = () => {
-    navigate("/tickets/form");
+    navigate("/crew/form");
   };
 
   const handleDelete = async (id: number) => {
-    if (confirm("Are you sure you want to delete this ticket?")) {
+    if (confirm("Are you sure you want to delete this crew member?")) {
       try {
-        await deleteTicket(id);
-        loadTickets();
+        await deleteCrew(id);
+        loadCrews();
       } catch (error) {
-        console.error("Failed to delete ticket", error);
+        console.error("Failed to delete crew member", error);
       }
     }
   };
@@ -73,48 +71,44 @@ const TicketPage = () => {
                 <div className="px-4 lg:px-6">
                   <Card>
                     <CardHeader className="flex flex-row items-center justify-between">
-                      <CardTitle>Ticket List</CardTitle>
+                      <CardTitle>Crew List</CardTitle>
                       <Button onClick={handleAdd}>
                         <Plus className="mr-2 h-4 w-4" />
-                        Add Ticket
+                        Add Crew Member
                       </Button>
                     </CardHeader>
                     <CardContent>
                       <table className="w-full text-left mt-4 border-collapse">
                         <thead>
                           <tr className="border-b">
-                            <th className="p-2">Passenger</th>
-                            <th className="p-2">Schedule ID</th>
-                            <th className="p-2">Seat</th>
-                            <th className="p-2">Price</th>
-                            <th className="p-2">Status</th>
+                            <th className="p-2">Name</th>
+                            <th className="p-2">Role</th>
+                            <th className="p-2">Experience (Years)</th>
                             <th className="p-2">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {tickets.length === 0 ? (
+                          {crews.length === 0 ? (
                             <tr>
-                              <td colSpan={6} className="p-2 text-center text-gray-500">
-                                No tickets found
+                              <td colSpan={4} className="p-2 text-center text-gray-500">
+                                No crew members found
                               </td>
                             </tr>
                           ) : (
-                            tickets.map((ticket) => (
-                              <tr key={ticket.ticketId} className="border-b">
-                                <td className="p-2">{ticket.passenger?.name}</td>
-                                <td className="p-2">{ticket.schedule?.scheduleId}</td>
-                                <td className="p-2">{ticket.seat?.seatNumber}</td>
-                                <td className="p-2">${ticket.price?.toFixed(2)}</td>
-                                <td className="p-2">{ticket.status}</td>
+                            crews.map((c) => (
+                              <tr key={c.crewId} className="border-b">
+                                <td className="p-2">{c.name}</td>
+                                <td className="p-2">{c.role}</td>
+                                <td className="p-2">{c.experienceYears}</td>
                                 <td className="p-2">
-                                  <Button variant="outline" size="sm" onClick={() => handleEdit(ticket.ticketId)}>
+                                  <Button variant="outline" size="sm" onClick={() => handleEdit(c.crewId)}>
                                     Edit
                                   </Button>
                                   <Button
                                     className="ml-2"
                                     variant="destructive"
                                     size="sm"
-                                    onClick={() => handleDelete(ticket.ticketId)}
+                                    onClick={() => handleDelete(c.crewId)}
                                   >
                                     Delete
                                   </Button>
@@ -136,4 +130,4 @@ const TicketPage = () => {
   );
 };
 
-export default TicketPage;
+export default CrewPage;

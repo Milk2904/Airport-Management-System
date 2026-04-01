@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Link } from "react-router";
+
 
 import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
@@ -26,6 +28,11 @@ import {
   CircleHelpIcon,
   SearchIcon,
   Building2Icon,
+  TicketIcon,
+  CalendarIcon,
+  BriefcaseIcon,
+  UserCheckIcon,
+  DoorClosedIcon,
 } from "lucide-react";
 
 const data = {
@@ -36,11 +43,17 @@ const data = {
   },
   navMain: [
     { title: "Flights", url: "/flights", icon: PlaneTakeoffIcon },
+    { title: "Flight Schedules", url: "/flight-schedules", icon: CalendarIcon },
     { title: "Passengers", url: "/passengers", icon: UsersIcon },
+    { title: "Tickets", url: "/tickets", icon: TicketIcon },
+    { title: "Baggage", url: "/baggage", icon: BriefcaseIcon },
     { title: "Aircraft", url: "/aircraft", icon: PlaneTakeoffIcon },
+    { title: "Seats", url: "/seats", icon: DoorClosedIcon },
     { title: "Airlines", url: "/airlines", icon: Building2Icon },
     { title: "Employees", url: "/employees", icon: IdCardIcon },
+    { title: "Crew", url: "/crew", icon: UserCheckIcon },
     { title: "Airports", url: "/airports", icon: DoorOpenIcon },
+    { title: "Gates", url: "/gates", icon: DoorClosedIcon },
     { title: "Analytics", url: "/analytics", icon: ChartBarIcon },
   ],
   documents: [
@@ -62,12 +75,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="p-1.5">
-              <a href="/">
+              <Link to="/dashboard">
                 <img src="./src/assets/Logo.png" alt="logo" className="size-7" />
                 <span className="text-base font-semibold">
                   Milkyway Airport
                 </span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

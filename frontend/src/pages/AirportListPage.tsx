@@ -11,7 +11,13 @@ import { Plus } from "lucide-react";
 
 const AirportListPage = () => {
   const navigate = useNavigate();
-  const [airports, setAirports] = useState([]);
+  const [airports, setAirports] = useState<{
+    airportId: number;
+    code: string;
+    name: string;
+    city: string;
+    country: string;
+  }[]>([]);
 
   const handleEdit = (id: number) => {
     navigate(`/airports/form?id=${id}`);
@@ -22,15 +28,23 @@ const AirportListPage = () => {
   };
 
   const remove = async (id: number) => {
-    await deleteAirport(id);
-    const res = await getAirports();
-    setAirports(res.data);
+    try {
+      await deleteAirport(id);
+      const res = await getAirports();
+      setAirports(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      console.error("Failed to delete airport", error);
+    }
   };
 
   useEffect(() => {
     (async () => {
-      const res = await getAirports();
-      setAirports(res.data);
+      try {
+        const res = await getAirports();
+        setAirports(Array.isArray(res.data) ? res.data : []);
+      } catch (error) {
+        console.error("Failed to fetch airports", error);
+      }
     })();
   }, []);
 
