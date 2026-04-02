@@ -8,8 +8,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { createSeat, getSeatById, updateSeat } from "@/service/SeatService";
+import { getAircrafts } from "@/service/AircraftService";
+
+interface Aircraft {
+  aircraftId: number;
+  model: string;
+}
 
 const SeatFormPage = () => {
   const navigate = useNavigate();
@@ -22,18 +35,31 @@ const SeatFormPage = () => {
     status: "AVAILABLE",
     aircraftId: "",
   });
+  const [aircrafts, setAircrafts] = useState<Aircraft[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadAircrafts = async () => {
+      try {
+        const res = await getAircrafts();
+        const data = res.data?.result ?? res.data;
+        setAircrafts(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to load aircrafts:", error);
+      }
+    };
+    loadAircrafts();
+  }, []);
 
   useEffect(() => {
     if (id) {
       getSeatById(Number(id)).then(res => {
-        // SeatController getById returns SeatResponse which should have seat properties
-        const t = res.data;
+        const data = res.data?.result ?? res.data;
         setFormData({
-          seatNumber: t.seatNumber || "",
-          seatClass: t.seatClass || "ECONOMY",
-          status: t.status || "AVAILABLE",
-          aircraftId: t.aircraftId?.toString() || "", // check SeatResponse logic
+          seatNumber: data.seatNumber || "",
+          seatClass: data.seatClass || "ECONOMY",
+          status: data.status || "AVAILABLE",
+          aircraftId: data.aircraft?.aircraftId?.toString() || data.aircraftId?.toString() || "",
         });
       }).catch(() => toast.error("Failed to fetch seat"));
     }
@@ -66,8 +92,12 @@ const SeatFormPage = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -99,36 +129,58 @@ const SeatFormPage = () => {
                           <Input type="text" id="seatNumber" name="seatNumber" value={formData.seatNumber || ""} onChange={handleChange} required />
                         </div>
                         <div>
-                          <Label htmlFor="aircraftId">Aircraft ID</Label>
-                          <Input type="number" id="aircraftId" name="aircraftId" value={formData.aircraftId || ""} onChange={handleChange} required />
+                          <Label htmlFor="aircraftId">Aircraft</Label>
+                          <Select 
+                            value={formData.aircraftId}
+                            onValueChange={(val) => handleSelectChange("aircraftId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select aircraft" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {aircrafts.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                aircrafts.map((aircraft) => (
+                                  <SelectItem key={aircraft.aircraftId} value={aircraft.aircraftId.toString()}>
+                                    {aircraft.model} (ID: {aircraft.aircraftId})
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="seatClass">Seat Class</Label>
-                          <select 
-                            id="seatClass" 
-                            name="seatClass" 
-                            value={formData.seatClass} 
-                            onChange={handleChange} 
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          <Select 
+                            value={formData.seatClass}
+                            onValueChange={(val) => handleSelectChange("seatClass", val)}
                           >
-                            <option value="ECONOMY">ECONOMY</option>
-                            <option value="BUSINESS">BUSINESS</option>
-                            <option value="FIRST_CLASS">FIRST_CLASS</option>
-                          </select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select class" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="ECONOMY">ECONOMY</SelectItem>
+                              <SelectItem value="BUSINESS">BUSINESS</SelectItem>
+                              <SelectItem value="FIRST_CLASS">FIRST_CLASS</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="status">Status</Label>
-                          <select 
-                            id="status" 
-                            name="status" 
-                            value={formData.status} 
-                            onChange={handleChange} 
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          <Select 
+                            value={formData.status}
+                            onValueChange={(val) => handleSelectChange("status", val)}
                           >
-                            <option value="AVAILABLE">AVAILABLE</option>
-                            <option value="BOOKED">BOOKED</option>
-                            <option value="MAINTENANCE">MAINTENANCE</option>
-                          </select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="AVAILABLE">AVAILABLE</SelectItem>
+                              <SelectItem value="BOOKED">BOOKED</SelectItem>
+                              <SelectItem value="MAINTENANCE">MAINTENANCE</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="flex gap-2 pt-4">
                           <Button type="submit" disabled={loading}>
@@ -150,3 +202,4 @@ const SeatFormPage = () => {
 };
 
 export default SeatFormPage;
+

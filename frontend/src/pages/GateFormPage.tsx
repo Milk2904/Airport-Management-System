@@ -8,8 +8,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { createGate, getGateById, updateGate } from "@/service/GateService";
+import { getAirports } from "@/service/AirportService";
+
+interface Airport {
+  airportId: number;
+  name: string;
+}
 
 const GateFormPage = () => {
   const navigate = useNavigate();
@@ -22,17 +35,31 @@ const GateFormPage = () => {
     status: "OPEN",
     airportId: "",
   });
+  const [airports, setAirports] = useState<Airport[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadAirports = async () => {
+      try {
+        const res = await getAirports();
+        const data = res.data?.result ?? res.data;
+        setAirports(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to load airports:", error);
+      }
+    };
+    loadAirports();
+  }, []);
 
   useEffect(() => {
     if (id) {
       getGateById(Number(id)).then(res => {
-        const g = res.data;
+        const data = res.data?.result ?? res.data;
         setFormData({
-          gateCode: g.gateCode || "",
-          terminal: g.terminal || "",
-          status: g.status || "OPEN",
-          airportId: g.airport?.airportId || "",
+          gateCode: data.gateCode || "",
+          terminal: data.terminal || "",
+          status: data.status || "OPEN",
+          airportId: data.airport?.airportId?.toString() || "",
         });
       }).catch(() => toast.error("Failed to fetch gate"));
     }
@@ -65,8 +92,12 @@ const GateFormPage = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -102,22 +133,42 @@ const GateFormPage = () => {
                           <Input type="text" id="terminal" name="terminal" value={formData.terminal || ""} onChange={handleChange} required />
                         </div>
                         <div>
-                          <Label htmlFor="airportId">Airport ID</Label>
-                          <Input type="number" id="airportId" name="airportId" value={formData.airportId || ""} onChange={handleChange} required />
+                          <Label htmlFor="airportId">Airport</Label>
+                          <Select 
+                            value={formData.airportId}
+                            onValueChange={(val) => handleSelectChange("airportId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select airport" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {airports.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                airports.map((airport) => (
+                                  <SelectItem key={airport.airportId} value={airport.airportId.toString()}>
+                                    {airport.name}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="status">Status</Label>
-                          <select 
-                            id="status" 
-                            name="status" 
-                            value={formData.status} 
-                            onChange={handleChange} 
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          <Select 
+                            value={formData.status}
+                            onValueChange={(val) => handleSelectChange("status", val)}
                           >
-                            <option value="OPEN">OPEN</option>
-                            <option value="CLOSED">CLOSED</option>
-                            <option value="MAINTENANCE">MAINTENANCE</option>
-                          </select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="OPEN">OPEN</SelectItem>
+                              <SelectItem value="CLOSED">CLOSED</SelectItem>
+                              <SelectItem value="MAINTENANCE">MAINTENANCE</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="flex gap-2 pt-4">
                           <Button type="submit" disabled={loading}>
@@ -139,3 +190,4 @@ const GateFormPage = () => {
 };
 
 export default GateFormPage;
+

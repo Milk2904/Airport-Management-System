@@ -8,8 +8,30 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { createBaggage, getBaggageById, updateBaggage } from "@/service/BaggageService";
+import { getTickets } from "@/service/TicketService";
+
+interface Ticket {
+  ticketId: number;
+  passenger?: {
+    employeeName?: string;
+    username?: string;
+    name?: string;
+  };
+  schedule?: {
+    flight?: {
+      flightNumber?: string;
+    };
+  };
+}
 
 const BaggageFormPage = () => {
   const navigate = useNavigate();
@@ -22,17 +44,31 @@ const BaggageFormPage = () => {
     type: "CHECKED",
     status: "CHECKED_IN",
   });
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadTickets = async () => {
+      try {
+        const res = await getTickets();
+        const data = res.data?.result ?? res.data;
+        setTickets(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to load tickets:", error);
+      }
+    };
+    loadTickets();
+  }, []);
 
   useEffect(() => {
     if (id) {
       getBaggageById(Number(id)).then(res => {
-        const t = res.data;
+        const data = res.data?.result ?? res.data;
         setFormData({
-          ticket: { ticketId: t.ticket?.ticketId || "" },
-          weight: t.weight || "",
-          type: t.type || "CHECKED",
-          status: t.status || "CHECKED_IN",
+          ticket: { ticketId: data.ticket?.ticketId?.toString() || "" },
+          weight: data.weight?.toString() || "",
+          type: data.type || "CHECKED",
+          status: data.status || "CHECKED_IN",
         });
       }).catch(() => toast.error("Failed to fetch baggage"));
     }
@@ -65,8 +101,12 @@ const BaggageFormPage = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     if (name === "ticketId") {
       setFormData(prev => ({ ...prev, ticket: { ticketId: value } }));
     } else {
@@ -98,8 +138,26 @@ const BaggageFormPage = () => {
                     <CardContent>
                       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
                         <div>
-                          <Label htmlFor="ticketId">Ticket ID</Label>
-                          <Input type="number" id="ticketId" name="ticketId" value={formData.ticket.ticketId || ""} onChange={handleChange} required />
+                          <Label htmlFor="ticket">Ticket</Label>
+                          <Select 
+                            value={formData.ticket.ticketId}
+                            onValueChange={(val) => handleSelectChange("ticketId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select ticket" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {tickets.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                tickets.map((t) => (
+                                  <SelectItem key={t.ticketId} value={t.ticketId.toString()}>
+                                    Ticket #{t.ticketId} - {t.schedule?.flight?.flightNumber || "Flight info missing"}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="weight">Weight (kg)</Label>
@@ -107,31 +165,35 @@ const BaggageFormPage = () => {
                         </div>
                         <div>
                           <Label htmlFor="type">Type</Label>
-                          <select 
-                            id="type" 
-                            name="type" 
-                            value={formData.type} 
-                            onChange={handleChange} 
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          <Select 
+                            value={formData.type}
+                            onValueChange={(val) => handleSelectChange("type", val)}
                           >
-                            <option value="CARRY_ON">CARRY ON</option>
-                            <option value="CHECKED">CHECKED</option>
-                          </select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="CARRY_ON">CARRY ON</SelectItem>
+                              <SelectItem value="CHECKED">CHECKED</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="status">Status</Label>
-                          <select 
-                            id="status" 
-                            name="status" 
-                            value={formData.status} 
-                            onChange={handleChange} 
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          <Select 
+                            value={formData.status}
+                            onValueChange={(val) => handleSelectChange("status", val)}
                           >
-                            <option value="CHECKED_IN">CHECKED_IN</option>
-                            <option value="LOADED">LOADED</option>
-                            <option value="CLAIMED">CLAIMED</option>
-                            <option value="LOST">LOST</option>
-                          </select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="CHECKED_IN">CHECKED_IN</SelectItem>
+                              <SelectItem value="LOADED">LOADED</SelectItem>
+                              <SelectItem value="CLAIMED">CLAIMED</SelectItem>
+                              <SelectItem value="LOST">LOST</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="flex gap-2 pt-4">
                           <Button type="submit" disabled={loading}>
@@ -153,3 +215,4 @@ const BaggageFormPage = () => {
 };
 
 export default BaggageFormPage;
+

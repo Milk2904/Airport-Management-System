@@ -41,8 +41,13 @@ const AircraftFormPage = () => {
 
   useEffect(() => {
     (async () => {
-      const res = await getAirlines();
-      setAirlines(res.data);
+      try {
+        const res = await getAirlines();
+        const data = res.data?.result ?? res.data;
+        setAirlines(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to load airlines:", error);
+      }
     })();
   }, []);
 
@@ -51,7 +56,8 @@ const AircraftFormPage = () => {
       (async () => {
         try {
           const res = await getAircraftById(parseInt(id));
-          setFormData(res.data);
+          const data = res.data?.result ?? res.data;
+          setFormData(data);
         } catch {
           toast.error("Failed to load aircraft");
           navigate("/aircraft");
@@ -151,11 +157,15 @@ const AircraftFormPage = () => {
                               <SelectValue placeholder="Select airline" />
                             </SelectTrigger>
                             <SelectContent>
-                              {airlines.map((airline) => (
-                                <SelectItem key={airline.airlineId} value={airline.airlineId.toString()}>
-                                  {airline.airlineName}
-                                </SelectItem>
-                              ))}
+                              {Array.isArray(airlines) && airlines.length > 0 ? (
+                                airlines.map((airline) => (
+                                  <SelectItem key={airline.airlineId} value={airline.airlineId.toString()}>
+                                    {airline.airlineName}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              )}
                             </SelectContent>
                           </Select>
                         </div>

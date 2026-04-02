@@ -1,4 +1,4 @@
-package com.airportmanagementsystem.airportmanagementsystem.Controller;
+package com.airportmanagementsystem.airportmanagementsystem.controller;
 
 
 import com.airportmanagementsystem.airportmanagementsystem.entity.Crew;

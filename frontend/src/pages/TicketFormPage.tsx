@@ -8,11 +8,45 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { createTicket, getTicketById, updateTicket } from "@/service/TicketService";
+import { getPassengers } from "@/service/PassengerService";
+import { getFlightSchedules } from "@/service/FlightScheduleService";
+import { getSeats } from "@/service/SeatService";
+import { getEmployees } from "@/service/EmployeeService";
 
-// For dropdowns, ideally we load passengers, schedules, seats and employees. Let's use simple inputs for the IDs for brevity.
-// In a production scenario, these would be robust async search selects.
+interface Passenger {
+  passengerId: number;
+  fullName: string;
+}
+
+interface FlightSchedule {
+  scheduleId: number;
+  flight?: {
+    flightNumber?: string;
+  };
+  departureTime?: string;
+}
+
+interface Seat {
+  seatId: number;
+  seatNumber: string;
+  aircraft?: {
+    model?: string;
+  };
+}
+
+interface Employee {
+  employeeId: number;
+  name: string;
+}
 
 const TicketFormPage = () => {
   const navigate = useNavigate();
@@ -27,19 +61,50 @@ const TicketFormPage = () => {
     price: "",
     status: "CONFIRMED",
   });
+  
+  const [passengers, setPassengers] = useState<Passenger[]>([]);
+  const [schedules, setSchedules] = useState<FlightSchedule[]>([]);
+  const [seats, setSeats] = useState<Seat[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [passengersRes, schedulesRes, seatsRes, employeesRes] = await Promise.all([
+          getPassengers(),
+          getFlightSchedules(),
+          getSeats(),
+          getEmployees()
+        ]);
+        
+        const pData = passengersRes.data?.result ?? passengersRes.data;
+        const schData = schedulesRes.data?.result ?? schedulesRes.data;
+        const sData = seatsRes.data?.result ?? seatsRes.data;
+        const eData = employeesRes.data?.result ?? employeesRes.data;
+
+        setPassengers(Array.isArray(pData) ? pData : []);
+        setSchedules(Array.isArray(schData) ? schData : []);
+        setSeats(Array.isArray(sData) ? sData : []);
+        setEmployees(Array.isArray(eData) ? eData : []);
+      } catch (error) {
+        console.error("Failed to load dependency data:", error);
+      }
+    };
+    loadData();
+  }, []);
 
   useEffect(() => {
     if (id) {
       getTicketById(Number(id)).then(res => {
-        const t = res.data;
+        const data = res.data?.result ?? res.data;
         setFormData({
-          passengerId: t.passenger?.passengerId || "",
-          scheduleId: t.schedule?.scheduleId || "",
-          seatId: t.seat?.seatId || "",
-          employeeId: t.employee?.employeeId || "",
-          price: t.price || "",
-          status: t.status || "CONFIRMED",
+          passengerId: data.passenger?.passengerId?.toString() || "",
+          scheduleId: data.schedule?.scheduleId?.toString() || "",
+          seatId: data.seat?.seatId?.toString() || "",
+          employeeId: data.employee?.employeeId?.toString() || "",
+          price: data.price?.toString() || "",
+          status: data.status || "CONFIRMED",
         });
       }).catch(() => toast.error("Failed to fetch ticket"));
     }
@@ -74,8 +139,12 @@ const TicketFormPage = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -103,20 +172,92 @@ const TicketFormPage = () => {
                     <CardContent>
                       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
                         <div>
-                          <Label htmlFor="passengerId">Passenger ID</Label>
-                          <Input type="number" id="passengerId" name="passengerId" value={formData.passengerId || ""} onChange={handleChange} required />
+                          <Label htmlFor="passengerId">Passenger</Label>
+                          <Select 
+                            value={formData.passengerId}
+                            onValueChange={(val) => handleSelectChange("passengerId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select passenger" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {passengers.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                passengers.map((p) => (
+                                  <SelectItem key={p.passengerId} value={p.passengerId.toString()}>
+                                    {p.fullName} (ID: {p.passengerId})
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
-                          <Label htmlFor="scheduleId">Schedule ID</Label>
-                          <Input type="number" id="scheduleId" name="scheduleId" value={formData.scheduleId || ""} onChange={handleChange} required />
+                          <Label htmlFor="scheduleId">Flight Schedule</Label>
+                          <Select 
+                            value={formData.scheduleId}
+                            onValueChange={(val) => handleSelectChange("scheduleId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select schedule" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {schedules.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                schedules.map((s) => (
+                                  <SelectItem key={s.scheduleId} value={s.scheduleId.toString()}>
+                                    {s.flight?.flightNumber || "Flight"} - {s.departureTime ? new Date(s.departureTime).toLocaleString() : "Date TBD"}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
-                          <Label htmlFor="seatId">Seat ID</Label>
-                          <Input type="number" id="seatId" name="seatId" value={formData.seatId || ""} onChange={handleChange} required />
+                          <Label htmlFor="seatId">Seat</Label>
+                          <Select 
+                            value={formData.seatId}
+                            onValueChange={(val) => handleSelectChange("seatId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select seat" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {seats.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                seats.map((s) => (
+                                  <SelectItem key={s.seatId} value={s.seatId.toString()}>
+                                    {s.seatNumber} ({s.aircraft?.model || "Aircraft"})
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
-                          <Label htmlFor="employeeId">Employee ID</Label>
-                          <Input type="number" id="employeeId" name="employeeId" value={formData.employeeId || ""} onChange={handleChange} required />
+                          <Label htmlFor="employeeId">Staff Member</Label>
+                          <Select 
+                            value={formData.employeeId}
+                            onValueChange={(val) => handleSelectChange("employeeId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select staff" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {employees.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                employees.map((e) => (
+                                  <SelectItem key={e.employeeId} value={e.employeeId.toString()}>
+                                    {e.name}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="price">Price ($)</Label>
@@ -124,17 +265,19 @@ const TicketFormPage = () => {
                         </div>
                         <div>
                           <Label htmlFor="status">Status</Label>
-                          <select 
-                            id="status" 
-                            name="status" 
-                            value={formData.status} 
-                            onChange={handleChange} 
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                          <Select 
+                            value={formData.status}
+                            onValueChange={(val) => handleSelectChange("status", val)}
                           >
-                            <option value="CONFIRMED">CONFIRMED</option>
-                            <option value="CANCELLED">CANCELLED</option>
-                            <option value="PENDING">PENDING</option>
-                          </select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="CONFIRMED">CONFIRMED</SelectItem>
+                              <SelectItem value="CANCELLED">CANCELLED</SelectItem>
+                              <SelectItem value="PENDING">PENDING</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="flex gap-2 pt-4">
                           <Button type="submit" disabled={loading}>
@@ -156,3 +299,4 @@ const TicketFormPage = () => {
 };
 
 export default TicketFormPage;
+
