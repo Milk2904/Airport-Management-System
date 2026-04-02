@@ -177,11 +177,15 @@ const EmployeeFormPage = () => {
                               <SelectValue placeholder="Select airport" />
                             </SelectTrigger>
                             <SelectContent>
-                              {airports.map((airport) => (
-                                <SelectItem key={airport.airportId} value={airport.airportId.toString()}>
-                                  {airport.name}
-                                </SelectItem>
-                              ))}
+                              {Array.isArray(airports) && airports.length > 0 ? (
+                                airports.map((airport) => (
+                                  <SelectItem key={airport.airportId} value={airport.airportId.toString()}>
+                                    {airport.name}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              )}
                             </SelectContent>
                           </Select>
                         </div>

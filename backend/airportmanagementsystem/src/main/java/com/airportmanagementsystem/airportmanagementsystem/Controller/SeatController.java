@@ -1,4 +1,4 @@
-package com.airportmanagementsystem.airportmanagementsystem.Controller;
+package com.airportmanagementsystem.airportmanagementsystem.controller;
 
 import com.airportmanagementsystem.airportmanagementsystem.dto.request.CreateSeatRequest;
 import com.airportmanagementsystem.airportmanagementsystem.dto.response.SeatResponse;

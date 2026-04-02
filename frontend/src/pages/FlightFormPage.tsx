@@ -202,11 +202,15 @@ const FlightFormPage = () => {
                               <SelectValue placeholder="Select departure airport" />
                             </SelectTrigger>
                             <SelectContent>
-                              {Array.isArray(airports) && airports.map((airport) => (
-                                <SelectItem key={airport.airportId} value={airport.airportId.toString()}>
-                                  {airport.name}
-                                </SelectItem>
-                              ))}
+                              {Array.isArray(airports) && airports.length > 0 ? (
+                                airports.map((airport) => (
+                                  <SelectItem key={airport.airportId} value={airport.airportId.toString()}>
+                                    {airport.name}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              )}
                             </SelectContent>
                           </Select>
                         </div>
@@ -220,11 +224,15 @@ const FlightFormPage = () => {
                               <SelectValue placeholder="Select arrival airport" />
                             </SelectTrigger>
                             <SelectContent>
-                              {Array.isArray(airports) && airports.map((airport) => (
-                                <SelectItem key={airport.airportId} value={airport.airportId.toString()}>
-                                  {airport.name}
-                                </SelectItem>
-                              ))}
+                              {Array.isArray(airports) && airports.length > 0 ? (
+                                airports.map((airport) => (
+                                  <SelectItem key={airport.airportId} value={airport.airportId.toString()}>
+                                    {airport.name}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              )}
                             </SelectContent>
                           </Select>
                         </div>
@@ -238,11 +246,15 @@ const FlightFormPage = () => {
                               <SelectValue placeholder="Select airline" />
                             </SelectTrigger>
                             <SelectContent>
-                              {Array.isArray(airlines) && airlines.map((airline) => (
-                                <SelectItem key={airline.airlineId} value={airline.airlineId.toString()}>
-                                  {airline.airlineName}
-                                </SelectItem>
-                              ))}
+                              {Array.isArray(airlines) && airlines.length > 0 ? (
+                                airlines.map((airline) => (
+                                  <SelectItem key={airline.airlineId} value={airline.airlineId.toString()}>
+                                    {airline.airlineName}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              )}
                             </SelectContent>
                           </Select>
                         </div>
@@ -256,11 +268,15 @@ const FlightFormPage = () => {
                               <SelectValue placeholder="Select aircraft" />
                             </SelectTrigger>
                             <SelectContent>
-                              {Array.isArray(aircrafts) && aircrafts.map((aircraft) => (
-                                <SelectItem key={aircraft.aircraftId} value={aircraft.aircraftId.toString()}>
-                                  {aircraft.model}
-                                </SelectItem>
-                              ))}
+                              {Array.isArray(aircrafts) && aircrafts.length > 0 ? (
+                                aircrafts.map((aircraft) => (
+                                  <SelectItem key={aircraft.aircraftId} value={aircraft.aircraftId.toString()}>
+                                    {aircraft.model}
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              )}
                             </SelectContent>
                           </Select>
                         </div>

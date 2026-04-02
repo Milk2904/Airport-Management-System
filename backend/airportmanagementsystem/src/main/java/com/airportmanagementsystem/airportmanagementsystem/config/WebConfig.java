@@ -29,4 +29,4 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/account/login", "/account");
     }
-}
+}

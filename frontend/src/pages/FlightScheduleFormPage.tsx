@@ -8,8 +8,33 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { createFlightSchedule, getFlightScheduleById, updateFlightSchedule } from "@/service/FlightScheduleService";
+import { getFlights } from "@/service/FlightService";
+import { getAircrafts } from "@/service/AircraftService";
+import { getGates } from "@/service/GateService";
+
+interface Flight {
+  flightId: number;
+  flightNumber: string;
+}
+
+interface Aircraft {
+  aircraftId: number;
+  model: string;
+}
+
+interface Gate {
+  gateId: number;
+  gateCode: string;
+}
 
 const FlightScheduleFormPage = () => {
   const navigate = useNavigate();
@@ -24,25 +49,51 @@ const FlightScheduleFormPage = () => {
     arrivalTime: "",
     status: "SCHEDULED",
   });
+  
+  const [flights, setFlights] = useState<Flight[]>([]);
+  const [aircrafts, setAircrafts] = useState<Aircraft[]>([]);
+  const [gates, setGates] = useState<Gate[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [flightsRes, aircraftsRes, gatesRes] = await Promise.all([
+          getFlights(),
+          getAircrafts(),
+          getGates()
+        ]);
+        
+        const fData = flightsRes.data?.result ?? flightsRes.data;
+        const aData = aircraftsRes.data?.result ?? aircraftsRes.data;
+        const gData = gatesRes.data?.result ?? gatesRes.data;
+
+        setFlights(Array.isArray(fData) ? fData : []);
+        setAircrafts(Array.isArray(aData) ? aData : []);
+        setGates(Array.isArray(gData) ? gData : []);
+      } catch (error) {
+        console.error("Failed to load dependency data:", error);
+      }
+    };
+    loadData();
+  }, []);
 
   useEffect(() => {
     if (id) {
       getFlightScheduleById(Number(id)).then(res => {
-        const s = res.data;
-        // Format LocalDateTime to datetime-local expected format (YYYY-MM-DDThh:mm)
+        const data = res.data?.result ?? res.data;
         const formatDateTime = (isoString?: string) => {
           if (!isoString) return "";
           return new Date(isoString).toISOString().slice(0, 16);
         };
         
         setFormData({
-          flightId: s.flight?.flightId || "",
-          aircraftId: s.aircraft?.aircraftId || "",
-          gateId: s.gate?.gateId || "",
-          departureTime: formatDateTime(s.departureTime),
-          arrivalTime: formatDateTime(s.arrivalTime),
-          status: s.status || "SCHEDULED",
+          flightId: data.flight?.flightId?.toString() || "",
+          aircraftId: data.aircraft?.aircraftId?.toString() || "",
+          gateId: data.gate?.gateId?.toString() || "",
+          departureTime: formatDateTime(data.departureTime),
+          arrivalTime: formatDateTime(data.arrivalTime),
+          status: data.status || "SCHEDULED",
         });
       }).catch(() => toast.error("Failed to fetch flight schedule"));
     }
@@ -63,8 +114,6 @@ const FlightScheduleFormPage = () => {
 
     try {
       if (id) {
-        // Backend FlightScheduleService update expects the same but maybe keeping flight mappings?
-        // In our backend `update` method directly replaces properties so it's fine.
         await updateFlightSchedule(Number(id), payload);
         toast.success("Flight schedule updated successfully");
       } else {
@@ -79,8 +128,12 @@ const FlightScheduleFormPage = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -107,23 +160,72 @@ const FlightScheduleFormPage = () => {
                     </CardHeader>
                     <CardContent>
                       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
-                        {!id && (
-                          // Only show flight, aircraft, gate ID fields on create (based on backend CREATE logic mapping)
-                          <>
-                            <div>
-                              <Label htmlFor="flightId">Flight ID</Label>
-                              <Input type="number" id="flightId" name="flightId" value={formData.flightId || ""} onChange={handleChange} required />
-                            </div>
-                            <div>
-                              <Label htmlFor="aircraftId">Aircraft ID</Label>
-                              <Input type="number" id="aircraftId" name="aircraftId" value={formData.aircraftId || ""} onChange={handleChange} required />
-                            </div>
-                            <div>
-                              <Label htmlFor="gateId">Gate ID</Label>
-                              <Input type="number" id="gateId" name="gateId" value={formData.gateId || ""} onChange={handleChange} required />
-                            </div>
-                          </>
-                        )}
+                        <div>
+                          <Label htmlFor="flightId">Flight</Label>
+                          <Select 
+                            value={formData.flightId}
+                            onValueChange={(val) => handleSelectChange("flightId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select flight" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {flights.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                flights.map((f) => (
+                                  <SelectItem key={f.flightId} value={f.flightId.toString()}>
+                                    {f.flightNumber}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="aircraftId">Aircraft</Label>
+                          <Select 
+                            value={formData.aircraftId}
+                            onValueChange={(val) => handleSelectChange("aircraftId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select aircraft" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {aircrafts.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                aircrafts.map((a) => (
+                                  <SelectItem key={a.aircraftId} value={a.aircraftId.toString()}>
+                                    {a.model} (ID: {a.aircraftId})
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="gateId">Gate</Label>
+                          <Select 
+                            value={formData.gateId}
+                            onValueChange={(val) => handleSelectChange("gateId", val)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select gate" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {gates.length === 0 ? (
+                                <div className="p-2 text-sm text-muted-foreground">Chưa có dữ liệu</div>
+                              ) : (
+                                gates.map((g) => (
+                                  <SelectItem key={g.gateId} value={g.gateId.toString()}>
+                                    {g.gateCode}
+                                  </SelectItem>
+                                ))
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div>
                           <Label htmlFor="departureTime">Departure Time</Label>
                           <Input type="datetime-local" id="departureTime" name="departureTime" value={formData.departureTime || ""} onChange={handleChange} required />
@@ -134,19 +236,21 @@ const FlightScheduleFormPage = () => {
                         </div>
                         <div>
                           <Label htmlFor="status">Status</Label>
-                          <select 
-                            id="status" 
-                            name="status" 
-                            value={formData.status} 
-                            onChange={handleChange} 
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          <Select 
+                            value={formData.status}
+                            onValueChange={(val) => handleSelectChange("status", val)}
                           >
-                            <option value="SCHEDULED">SCHEDULED</option>
-                            <option value="DELAYED">DELAYED</option>
-                            <option value="DEPARTED">DEPARTED</option>
-                            <option value="ARRIVED">ARRIVED</option>
-                            <option value="CANCELLED">CANCELLED</option>
-                          </select>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="SCHEDULED">SCHEDULED</SelectItem>
+                              <SelectItem value="DELAYED">DELAYED</SelectItem>
+                              <SelectItem value="DEPARTED">DEPARTED</SelectItem>
+                              <SelectItem value="ARRIVED">ARRIVED</SelectItem>
+                              <SelectItem value="CANCELLED">CANCELLED</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="flex gap-2 pt-4">
                           <Button type="submit" disabled={loading}>
@@ -168,3 +272,4 @@ const FlightScheduleFormPage = () => {
 };
 
 export default FlightScheduleFormPage;
+
